@@ -45,7 +45,7 @@ export const estimateData: EstimateSection[] = [
     questions: [
       {
         id: "1-1",
-        question: "住まいの種類は？",
+        question: "お住まいの種類を教えてください。",
         options: [
           { label: "賃貸アパート", price: 0 },
           { label: "賃貸マンション", price: 0 },
