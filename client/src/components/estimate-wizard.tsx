@@ -168,9 +168,10 @@ export default function EstimateWizard() {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleHelp(currentQuestionData.help.reason, currentQuestionData.help.guide)}
-                className="text-gray-400 hover:text-primary"
+                className="text-sky-400 hover:text-sky-600 flex items-center space-x-1 bg-sky-50 hover:bg-sky-100 rounded-full px-3 py-2"
               >
-                <HelpCircle className="w-5 h-5" />
+                <HelpCircle className="w-4 h-4" />
+                <span className="text-xs font-medium">ヘルプ</span>
               </Button>
             </div>
 
