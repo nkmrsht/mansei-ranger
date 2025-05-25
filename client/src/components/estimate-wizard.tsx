@@ -235,16 +235,7 @@ export default function EstimateWizard() {
         <Dialog open={showHelp} onOpenChange={setShowHelp}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex justify-between items-center">
-                この質問について
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHelp(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </DialogTitle>
+              <DialogTitle>この質問について</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
