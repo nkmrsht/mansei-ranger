@@ -59,7 +59,7 @@ export const estimateData: EstimateSection[] = [
       },
       {
         id: "1-2",
-        question: "取付ける部屋は何階？",
+        question: "取付ける部屋は何階ですか？",
         options: [
           { label: "1階", price: 0 },
           { label: "2階", price: 0 },
@@ -72,7 +72,7 @@ export const estimateData: EstimateSection[] = [
       },
       {
         id: "1-3",
-        question: "室外機をどこに置く？",
+        question: "室外機をどこに置きますか？",
         options: [
           { label: "同じ階・ベランダなど", price: 0 },
           { label: "1階に降ろして置く", price: 11000 },
