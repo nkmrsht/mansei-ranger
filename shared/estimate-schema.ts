@@ -219,5 +219,5 @@ export const estimateData: EstimateSection[] = [
 ];
 
 // ベース料金
-export const BASE_INSTALLATION_PRICE = 19000; // キャンペーン価格
+export const BASE_INSTALLATION_PRICE = 17500; // キャンペーン価格
 export const ORIGINAL_PRICE = 22000; // 通常価格
