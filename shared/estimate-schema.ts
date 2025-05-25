@@ -139,8 +139,8 @@ export const estimateData: EstimateSection[] = [
         question: "室内機から室外機までの距離（配管の長さ）はどれくらいですか？",
         options: [
           { label: "4m以内", price: 0 },
-          { label: "4～7m", price: 7000 },
-          { label: "7m超", price: 3500 },
+          { label: "4～8m", price: 7000 },
+          { label: "8m超", price: 17500 },
           { label: "わからない", price: 0 }
         ],
         help: {
