@@ -191,7 +191,7 @@ export default function EstimateWizard() {
                     <div className="flex justify-between items-center">
                       <span className="font-medium">{option.label}</span>
                       <span className={`font-bold ${
-                        option.price > 0 ? 'text-primary' : 'text-green-600'
+                        option.price > 0 ? 'text-primary' : 'text-black'
                       }`}>
                         {option.price > 0 ? `+¥${option.price.toLocaleString()}` : '¥0'}
                       </span>
