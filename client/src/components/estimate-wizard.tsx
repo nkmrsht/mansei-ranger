@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import { estimateData, BASE_INSTALLATION_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
+import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
 
 export default function EstimateWizard() {
   const [, setLocation] = useLocation();
@@ -114,7 +114,8 @@ export default function EstimateWizard() {
               <div className="space-y-4">
                 <div className="bg-gray-50 p-4 rounded-xl border border-apple-border">
                   <p className="text-sm text-gray-600">
-                    <strong>標準取付工事費：</strong> ¥{BASE_INSTALLATION_PRICE.toLocaleString()}<br />
+                    <strong>キャンペーン特価：</strong> <span className="text-lg font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span> 
+                    <span className="text-gray-500 line-through ml-2">¥{ORIGINAL_PRICE.toLocaleString()}</span><br />
                     <small>※設置条件により追加料金が発生する場合があります</small>
                   </p>
                 </div>

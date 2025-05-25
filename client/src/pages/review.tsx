@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Edit3 } from "lucide-react";
-import { estimateData, BASE_INSTALLATION_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
+import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
 
 interface EstimateResult {
   answers: EstimateAnswer[];
@@ -116,10 +116,13 @@ export default function Review() {
               {/* 基本工事費 */}
               <div className="flex justify-between items-center py-3 border-b border-gray-200">
                 <div>
-                  <span className="font-medium">標準取付工事費</span>
-                  <p className="text-sm text-gray-600">室内機・室外機の取付、配管接続など</p>
+                  <span className="font-medium">標準取付工事費（キャンペーン特価）</span>
+                  <p className="text-sm text-gray-600">
+                    室内機・室外機の取付、配管接続など
+                    <span className="text-gray-500 line-through ml-2">通常¥{ORIGINAL_PRICE.toLocaleString()}</span>
+                  </p>
                 </div>
-                <span className="font-bold">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
+                <span className="font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
               </div>
 
               {/* 追加工事費 */}
