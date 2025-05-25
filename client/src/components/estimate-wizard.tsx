@@ -113,6 +113,9 @@ export default function EstimateWizard() {
               </p>
               <div className="space-y-4">
                 <div className="bg-gray-50 p-4 rounded-xl border border-apple-border">
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>標準取付工事費用</strong>
+                  </p>
                   <p className="text-sm text-gray-600">
                     <strong>キャンペーン特価：</strong> <span className="text-lg font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span> 
                     <span className="text-gray-500 line-through ml-2">¥{ORIGINAL_PRICE.toLocaleString()}</span><br />
