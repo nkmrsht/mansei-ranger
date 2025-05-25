@@ -137,7 +137,7 @@ export default function EstimateWizard() {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white min-h-screen">
+    <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-2xl mx-auto px-4">
         {/* プログレスバー */}
         <div className="mb-8">
