@@ -99,9 +99,15 @@ export default function Review() {
               <div className="text-5xl font-bold text-primary mb-6">
                 ¥{estimateResult.totalPrice.toLocaleString()}
               </div>
-              <p className="text-sm text-gray-600">
-                ※表示価格は税込みです。追加料金は一切ございません。
-              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6 text-left max-w-2xl mx-auto">
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>※この金額は「仮見積もり」です。</strong>
+                </p>
+                <p className="text-sm text-gray-700">
+                  実際の作業前に訪問見積もり（現地調査）を行い、正式な金額をご案内いたします。<br />
+                  現場状況によっては追加費用が発生する場合がございますが、必ずご説明し、ご納得いただいてから作業を開始しますのでご安心ください。
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
