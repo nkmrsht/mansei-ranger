@@ -128,7 +128,7 @@ export default function Review() {
                     <span className="text-gray-500 line-through ml-2">通常¥{ORIGINAL_PRICE.toLocaleString()}</span>
                   </p>
                 </div>
-                <span className="font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
+                <span className="font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}（税込）</span>
               </div>
 
               {/* 追加工事費 */}
@@ -138,7 +138,7 @@ export default function Review() {
                     <span className="font-medium">{item!.selectedOption}</span>
                     <p className="text-sm text-gray-600">{item!.question}</p>
                   </div>
-                  <span className="font-bold text-primary">+¥{item!.price.toLocaleString()}</span>
+                  <span className="font-bold text-primary">+¥{item!.price.toLocaleString()}（税込）</span>
                 </div>
               ))}
 
@@ -151,7 +151,7 @@ export default function Review() {
               {/* 合計 */}
               <div className="flex justify-between items-center py-4 border-t-2 border-gray-300 text-lg font-bold">
                 <span>合計金額</span>
-                <span className="text-primary">¥{estimateResult.totalPrice.toLocaleString()}</span>
+                <span className="text-primary">¥{estimateResult.totalPrice.toLocaleString()}（税込）</span>
               </div>
             </div>
           </CardContent>
@@ -179,9 +179,11 @@ export default function Review() {
                               <p className="font-medium">{item!.question}</p>
                               <p className="text-primary">{item!.selectedOption}</p>
                             </div>
-                            <span className="text-sm text-gray-600">
-                              {item!.price > 0 ? `+¥${item!.price.toLocaleString()}` : '¥0'}
-                            </span>
+                            {item!.price > 0 && (
+                              <span className="text-sm text-gray-600">
+                                +¥{item!.price.toLocaleString()}（税込）
+                              </span>
+                            )}
                           </div>
                         </div>
                       ))}
