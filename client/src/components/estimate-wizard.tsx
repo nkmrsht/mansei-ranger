@@ -218,7 +218,7 @@ export default function EstimateWizard() {
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-1">現在の見積り金額</p>
             <p className="text-2xl font-bold text-primary">
-              ¥{calculateTotal().toLocaleString()}
+              ¥{calculateTotal().toLocaleString()}（税込）
             </p>
           </div>
 

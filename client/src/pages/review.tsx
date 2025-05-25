@@ -97,7 +97,7 @@ export default function Review() {
                 エアコン取付工事の総額は以下の通りです
               </p>
               <div className="text-5xl font-bold text-primary mb-6">
-                ¥{estimateResult.totalPrice.toLocaleString()}
+                ¥{estimateResult.totalPrice.toLocaleString()}（税込）
               </div>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6 text-left max-w-2xl mx-auto">
                 <p className="text-sm text-gray-700 mb-2">
