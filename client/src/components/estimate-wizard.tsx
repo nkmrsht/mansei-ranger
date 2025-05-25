@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Calculator, ArrowRight, ArrowLeft, HelpCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,24 +14,6 @@ export default function EstimateWizard() {
   const [answers, setAnswers] = useState<EstimateAnswer[]>([]);
   const [showHelp, setShowHelp] = useState(false);
   const [helpContent, setHelpContent] = useState({ reason: "", guide: "" });
-
-  // 既存の見積りデータがあるかチェック
-  useEffect(() => {
-    const stored = localStorage.getItem('estimateResult');
-    if (stored) {
-      try {
-        const result = JSON.parse(stored);
-        if (result.answers && result.answers.length > 0) {
-          setAnswers(result.answers);
-          // 最後のステップから開始
-          setCurrentStep(Math.max(0, result.answers.length - 1));
-          setIsStarted(true);
-        }
-      } catch (e) {
-        // localStorage データが無効な場合は無視
-      }
-    }
-  }, []);
 
   // 全質問を平坦化
   const allQuestions = estimateData.flatMap(section => 
