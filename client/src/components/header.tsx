@@ -18,13 +18,13 @@ export default function Header() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-apple-text">電化のマンセイ</h1>
-            <p className="text-sm text-gray-600">創業50年の信頼</p>
+            <p className="text-sm text-gray-600">エアコン取付だけも大歓迎！ネット購入・持込OK、明朗会計で安心</p>
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-4">
-          <a href="tel:047-123-4567" className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors">
+          <a href="tel:047-364-8112" className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors">
             <Phone className="w-4 h-4" />
-            <span className="font-medium">047-123-4567</span>
+            <span className="font-medium">047-364-8112</span>
           </a>
           <Button 
             onClick={handleEstimateClick}
