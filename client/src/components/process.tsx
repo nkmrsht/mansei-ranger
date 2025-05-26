@@ -1,3 +1,4 @@
+import React from "react";
 import { Calculator, Calendar, MapPin, Wrench, Shield, ArrowRight, ChevronDown } from "lucide-react";
 
 export default function Process() {
@@ -77,8 +78,17 @@ export default function Process() {
                       
                       {/* 矢印アイコン */}
                       {index < steps.length - 1 && (
-                        <div className="absolute top-10 -right-6 w-12 h-12 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
-                          <ArrowRight className="w-5 h-5 text-primary animate-pulse" />
+                        <div className="absolute top-8 -right-8 z-20">
+                          <div className="relative">
+                            <div className="w-16 h-16 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-gray-100/50">
+                              <div className="w-8 h-8 bg-gradient-to-r from-primary to-blue-600 rounded-full flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="absolute inset-0 w-16 h-16 bg-primary/10 rounded-full animate-ping"></div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -86,8 +96,8 @@ export default function Process() {
                   
                   <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90">
                     <div className="mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-                        <div className="flex items-center justify-center w-full h-full">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl mx-auto">
+                        <div className="w-full h-full flex items-center justify-center">
                           {step.icon}
                         </div>
                       </div>
@@ -116,10 +126,17 @@ export default function Process() {
                   <div className="absolute inset-0 w-20 h-20 bg-primary/20 rounded-full animate-ping opacity-50"></div>
                   
                   {index < steps.length - 1 && (
-                    <div className="absolute top-20 left-10 flex flex-col items-center">
-                      <div className="w-0.5 h-8 bg-gradient-to-b from-primary/60 to-primary/20"></div>
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-blue-600/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 mt-2">
-                        <ChevronDown className="w-4 h-4 text-primary animate-bounce" />
+                    <div className="absolute top-20 left-10 flex flex-col items-center z-20">
+                      <div className="w-0.5 h-6 bg-gradient-to-b from-primary/60 to-primary/20"></div>
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-gray-100/50 mt-2">
+                          <div className="w-6 h-6 bg-gradient-to-b from-primary to-blue-600 rounded-full flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute inset-0 w-12 h-12 bg-primary/10 rounded-full animate-ping mt-2"></div>
                       </div>
                     </div>
                   )}
@@ -127,8 +144,8 @@ export default function Process() {
                 
                 <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
                   <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl flex items-center justify-center mr-4">
-                      <div className="flex items-center justify-center w-full h-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4">
+                      <div className="w-full h-full flex items-center justify-center">
                         {step.icon}
                       </div>
                     </div>
