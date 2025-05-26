@@ -1,4 +1,5 @@
 import { Award, ShieldCheck, FileText, Headphones, Zap, ShoppingCart } from "lucide-react";
+import staffLeaderImage from "../assets/images/staff-leader.jpg";
 
 export default function TrustSignals() {
   const trustPoints = [
@@ -44,7 +45,7 @@ export default function TrustSignals() {
     {
       name: "田中 一郎",
       position: "代表取締役",
-      image: "/images/staff-leader.jpg",
+      image: staffLeaderImage,
       comment: "お客様の快適な暮らしを第一に、誠実な工事を心がけています"
     },
     {
