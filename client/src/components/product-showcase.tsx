@@ -3,27 +3,27 @@ import { Button } from "@/components/ui/button";
 export default function ProductShowcase() {
   const products = [
     {
-      name: "ダイキン AN28ZRS-W",
-      specs: "10畳用・省エネ性能★★★★☆",
-      price: "¥89,800",
-      originalPrice: "¥120,000",
-      discount: "25%OFF",
+      name: "シャープ AC-22TFC",
+      specs: "6畳用｜シャープ独自の省エネ＆コンパクト設計、寝室・子供部屋に最適なベーシックモデル",
+      price: "¥85,000",
+      originalPrice: "",
+      discount: "標準取付工事費用込み",
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
     },
     {
-      name: "三菱電機 MSZ-GV2822",
-      specs: "10畳用・高機能モデル",
-      price: "¥95,800",
-      originalPrice: "¥135,000",
-      discount: "29%OFF",
+      name: "パナソニック CS-225DFL",
+      specs: "6畳用｜ナノイーX搭載で空気も清潔。お手入れ簡単・快適スタンダード機種",
+      price: "¥105,000",
+      originalPrice: "",
+      discount: "標準取付工事費用込み",
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
     },
     {
-      name: "パナソニック CS-282DFL",
-      specs: "10畳用・エオリア",
-      price: "¥92,800",
-      originalPrice: "¥128,000",
-      discount: "27%OFF",
+      name: "パナソニック CS-225DEX",
+      specs: "6畳用｜最高クラスの省エネ＆快適性。自動お掃除＆AI快適制御搭載のプレミアムモデル",
+      price: "¥174,000",
+      originalPrice: "",
+      discount: "標準取付工事費用込み",
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
     },
 
@@ -56,9 +56,12 @@ export default function ProductShowcase() {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-2xl font-bold text-primary">{product.price}</span>
-                      <span className="text-sm text-gray-500 line-through ml-2">{product.originalPrice}</span>
+                      <span className="text-xs text-gray-500 ml-1">(税込)</span>
+                      {product.originalPrice && (
+                        <span className="text-sm text-gray-500 line-through ml-2">{product.originalPrice}</span>
+                      )}
                     </div>
-                    <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
                       {product.discount}
                     </span>
                   </div>
