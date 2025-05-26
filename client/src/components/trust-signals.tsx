@@ -1,5 +1,7 @@
 import { Award, ShieldCheck, FileText, Headphones, Zap, ShoppingCart } from "lucide-react";
 import staffLeaderImage from "../assets/images/staff-leader.jpg";
+import staffSatoImage from "../assets/images/staff-sato.jpg";
+import staffSuzukiImage from "../assets/images/staff-suzuki.png";
 
 export default function TrustSignals() {
   const trustPoints = [
@@ -51,13 +53,13 @@ export default function TrustSignals() {
     {
       name: "佐藤 二郎",
       position: "技術長・電気工事士",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      image: staffSatoImage,
       comment: "安全で確実な工事を通じて、地域の皆様に貢献したいと思います"
     },
     {
       name: "鈴木 三郎",
       position: "工事主任",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      image: staffSuzukiImage,
       comment: "細部まで丁寧な施工で、お客様に満足いただける仕上がりを目指します"
     }
   ];
