@@ -18,9 +18,9 @@ export default function Hero() {
         </div>
         
         <h1 className="text-4xl md:text-6xl font-bold text-apple-text mb-6 leading-tight">
-          本体も工事も、<br />
+          エアコン本体も工事も<br />
           もっと<span className="text-primary">お得に！</span><br />
-          エアコン取付だけでもOK
+          取付工事だけでもOK
         </h1>
         
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
