@@ -36,9 +36,20 @@ export default function ProductShowcase() {
           <h2 className="text-3xl md:text-4xl font-bold text-apple-text mb-6">
             本体も地元卸価格で激安提供
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            取付工事とセットなら、さらにお得な価格でエアコン本体もご提供できます
-          </p>
+          <div className="text-gray-600 max-w-4xl mx-auto space-y-4">
+            <p className="text-lg">
+              掲載商品は一例です。<br />
+              6畳用以外にも、4.5畳～20畳まで全サイズ・全メーカーを取り扱いしています。
+            </p>
+            <p className="text-base">
+              お部屋の広さやご予算、ご希望の機能・メーカーなどに合わせて、<br />
+              あなたにピッタリの機種をご提案します！
+            </p>
+            <p className="text-base">
+              「ネットにない型番」「他店で見かけたモデル」「最新の高性能機種」などもOK。<br />
+              お気軽にご相談ください。
+            </p>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -70,7 +81,7 @@ export default function ProductShowcase() {
 
         <div className="text-center mt-8">
           <Button className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
-            全商品を見る
+            まずは相談から始める
           </Button>
         </div>
       </div>
