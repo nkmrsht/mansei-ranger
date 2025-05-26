@@ -116,9 +116,16 @@ export default function EstimateWizard() {
                   <p className="text-sm text-gray-600 mb-2">
                     <strong>標準取付工事費用</strong>
                   </p>
+                  <div className="mb-3">
+                    <p className="text-lg font-bold text-red-600 mb-2">
+                      🎉 キャンペーン特価
+                    </p>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
+                      <span className="text-lg text-gray-500 line-through">¥{ORIGINAL_PRICE.toLocaleString()}</span>
+                    </div>
+                  </div>
                   <p className="text-sm text-gray-600">
-                    <strong>キャンペーン特価：</strong> <span className="text-lg font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span> 
-                    <span className="text-gray-500 line-through ml-2">¥{ORIGINAL_PRICE.toLocaleString()}</span><br />
                     <small>※設置条件により追加料金が発生する場合があります</small>
                   </p>
                 </div>
