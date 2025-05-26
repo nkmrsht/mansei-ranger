@@ -39,7 +39,7 @@ export default function Footer() {
               <li><a href="https://d-mansei.co.jp/about" className="hover:text-gray-300 transition-colors">電化のマンセイについて</a></li>
               <li><a href="https://d-mansei.co.jp/service" className="hover:text-gray-300 transition-colors">電化のマンセイができること</a></li>
               <li><a href="https://d-mansei.co.jp/blog" className="hover:text-gray-300 transition-colors">スタッフブログ</a></li>
-              <li><a href="https://d-mansei.co.jp/contact" className="hover:text-gray-300 transition-colors">お問い合わせ</a></li>
+              <li><a href="https://d-mansei.co.jp/privacy" className="hover:text-gray-300 transition-colors">個人情報の取り扱いについて</a></li>
             </ul>
           </div>
 
