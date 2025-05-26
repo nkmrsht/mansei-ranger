@@ -24,8 +24,8 @@ export default function Hero() {
         </h1>
         
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-          ネットや量販店で買ったエアコンの「取付だけ」も大歓迎<br />
-          地元電気屋ならではの業者卸価格で本体も購入可能<br />
+          ネットや量販店で買ったエアコンの「取付だけ」でも大歓迎！<br />
+          エアコン本体も、地元の電気屋ならではの業者卸価格でご用意しました。<br />
           本体＋標準取付セットもラインナップ
         </p>
         
