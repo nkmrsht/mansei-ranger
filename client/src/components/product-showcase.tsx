@@ -81,7 +81,7 @@ export default function ProductShowcase() {
             </p>
           </div>
           <Button className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
-            まずは相談から始める
+            本体＋取付セットはこちら
           </Button>
         </div>
       </div>
