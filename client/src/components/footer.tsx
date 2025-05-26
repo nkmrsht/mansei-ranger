@@ -13,8 +13,8 @@ export default function Footer() {
   return (
     <footer className="py-16 mb-16 md:mb-0" style={{backgroundColor: '#333', color: '#FFF'}}>
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div>
+        <div className="grid md:grid-cols-10 gap-6">
+          <div className="md:col-span-4">
             <div className="flex items-center space-x-3 mb-4">
               <img 
                 src={logoMansei}
@@ -34,7 +34,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
+          <div className="md:col-span-3">
             <h4 className="font-bold mb-4 text-white">会社情報</h4>
             <ul className="space-y-2 text-white">
               <li><a href="https://d-mansei.co.jp/about" className="hover:text-gray-300 transition-colors">電化のマンセイについて</a></li>
@@ -44,7 +44,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="md:col-span-3">
             <h4 className="font-bold mb-4 text-white">お問い合わせ</h4>
             <div className="space-y-4">
               <a href="https://d-mansei.co.jp/contact" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
