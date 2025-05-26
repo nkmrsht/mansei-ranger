@@ -46,7 +46,7 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-4 text-white">お問い合わせ</h4>
             <div className="space-y-4">
-              <a href="mailto:" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
+              <a href="https://d-mansei.co.jp/contact" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
                 <Mail className="w-4 h-4" />
                 <span>メールで相談</span>
               </a>
