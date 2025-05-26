@@ -54,9 +54,6 @@ export default function Process() {
         {/* デスクトップ表示 */}
         <div className="hidden lg:block">
           <div className="relative">
-            {/* 背景の装飾要素 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-3xl"></div>
-            
             {/* 接続線 */}
             <div className="absolute top-32 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent z-0"></div>
             
@@ -82,7 +79,7 @@ export default function Process() {
                     )}
                   </div>
                   
-                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90 h-56 flex flex-col">
+                  <div className="bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90 h-72 flex flex-col">
                     <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
                       <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl mx-auto flex items-center justify-center">
                         {step.icon}
