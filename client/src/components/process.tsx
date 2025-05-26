@@ -38,7 +38,7 @@ export default function Process() {
   return (
     <section className="py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-20">
+        <div className="text-center mb-12">
           <div className="inline-flex items-center bg-primary/10 rounded-full px-6 py-2 mb-6">
             <span className="text-primary font-semibold text-sm">簡単5ステップ</span>
           </div>
