@@ -1,4 +1,4 @@
-import { Zap, Phone, MessageCircle } from "lucide-react";
+import { Zap, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoMansei from "../assets/images/logo-mansei.jpg";
 
@@ -46,9 +46,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-4 text-white">お問い合わせ</h4>
             <div className="space-y-4">
-              <a href="tel:047-364-8112" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
-                <Phone className="w-4 h-4" />
-                <span>047-364-8112</span>
+              <a href="mailto:" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
+                <Mail className="w-4 h-4" />
+                <span>メールで相談</span>
               </a>
               <a href="https://lin.ee/0OsWYCs" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
                 <MessageCircle className="w-4 h-4" />
