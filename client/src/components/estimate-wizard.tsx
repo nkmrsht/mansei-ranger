@@ -111,29 +111,53 @@ export default function EstimateWizard() {
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 約3分で完了します。設置条件に応じた正確な工事費用をご確認いただけます。
               </p>
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-xl border border-apple-border">
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>標準取付工事費用</strong>
-                  </p>
-                  <div className="mb-3">
-                    <p className="text-lg font-bold text-red-600 mb-2">
-                      🎉 キャンペーン特価
+              <div className="flex flex-col items-center space-y-8">
+                <div className="w-full max-w-lg bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    <p className="text-sm font-medium text-gray-700">
+                      標準取付工事費用
                     </p>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
-                      <span className="text-lg text-gray-500 line-through">¥{ORIGINAL_PRICE.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="relative mb-4">
+                    <div className="absolute -top-1 -left-1 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">限定</span>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 border border-white/50 shadow-sm">
+                      <p className="text-red-600 font-bold text-lg mb-2 flex items-center justify-center">
+                        <span className="mr-2">🎉</span>
+                        キャンペーン特価
+                      </p>
+                      <div className="flex items-baseline justify-center space-x-3">
+                        <span className="text-3xl font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500">通常価格</span>
+                          <span className="text-lg text-gray-500 line-through">¥{ORIGINAL_PRICE.toLocaleString()}</span>
+                        </div>
+                        <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                          ¥{(ORIGINAL_PRICE - BASE_INSTALLATION_PRICE).toLocaleString()}お得
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    <small>※設置条件により追加料金が発生する場合があります</small>
-                  </p>
+                  
+                  <div className="flex items-center justify-center text-sm text-gray-600">
+                    <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
+                    <span>設置条件により追加料金が発生する場合があります</span>
+                  </div>
                 </div>
+                
                 <Button 
                   onClick={() => setIsStarted(true)}
-                  className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors"
+                  className="bg-gradient-to-r from-primary to-blue-600 text-white px-16 py-6 rounded-3xl text-xl font-bold hover:from-primary/90 hover:to-blue-600/90 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl w-full max-w-sm"
                 >
-                  見積り開始
+                  <span className="flex items-center justify-center space-x-3">
+                    <span>見積り開始</span>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
                 </Button>
               </div>
             </div>
@@ -165,42 +189,61 @@ export default function EstimateWizard() {
         </div>
 
         {/* 質問カード */}
-        <Card className="mb-8">
+        <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-bold text-apple-text">
-                {currentQuestionData.question}
-              </h2>
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <div className="flex items-center mb-3">
+                  <div className="w-3 h-3 bg-primary rounded-full mr-3"></div>
+                  <span className="text-sm font-medium text-primary">質問 {currentStep + 1}</span>
+                </div>
+                <h2 className="text-2xl font-bold text-apple-text leading-relaxed">
+                  {currentQuestionData.question}
+                </h2>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleHelp(currentQuestionData.help.reason, currentQuestionData.help.guide)}
-                className="text-sky-400 hover:text-sky-600 flex items-center space-x-1 bg-sky-50 hover:bg-sky-100 rounded-full px-3 py-2"
+                className="text-sky-500 hover:text-sky-600 flex items-center space-x-2 bg-gradient-to-r from-sky-50 to-blue-50 hover:from-sky-100 hover:to-blue-100 rounded-full px-4 py-2 border border-sky-200/50 shadow-sm"
               >
                 <HelpCircle className="w-4 h-4" />
-                <span className="text-xs font-medium">ヘルプ</span>
+                <span className="text-sm font-medium">ヘルプ</span>
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {currentQuestionData.options.map((option, index) => {
                 const isSelected = getCurrentAnswer()?.selectedOption === index;
                 return (
                   <button
                     key={index}
                     onClick={() => handleOptionSelect(index)}
-                    className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 transform hover:scale-[1.02] ${
                       isSelected 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-gradient-to-r from-primary/5 to-blue-50 shadow-md' 
+                        : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
                     }`}
                   >
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">{option.label}</span>
+                      <div className="flex items-center">
+                        <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
+                          isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="font-medium text-gray-800">{option.label}</span>
+                      </div>
                       {option.price > 0 && (
-                        <span className="font-bold text-primary">
-                          +¥{option.price.toLocaleString()}（税込）
-                        </span>
+                        <div className="bg-primary/10 px-3 py-1 rounded-full">
+                          <span className="font-bold text-primary text-sm">
+                            +¥{option.price.toLocaleString()}（税込）
+                          </span>
+                        </div>
                       )}
                     </div>
                   </button>
@@ -216,23 +259,23 @@ export default function EstimateWizard() {
             variant="outline"
             onClick={handlePrev}
             disabled={currentStep === 0}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 rounded-xl border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>戻る</span>
           </Button>
 
-          <div className="text-center">
+          <div className="text-center bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
             <p className="text-sm text-gray-600 mb-1">現在の見積り金額</p>
             <p className="text-2xl font-bold text-primary">
-              ¥{calculateTotal().toLocaleString()}（税込）
+              ¥{calculateTotal().toLocaleString()}<span className="text-sm">（税込）</span>
             </p>
           </div>
 
           <Button
             onClick={handleNext}
             disabled={!canProceed()}
-            className="bg-primary text-white flex items-center space-x-2"
+            className="bg-gradient-to-r from-primary to-blue-600 text-white flex items-center space-x-2 rounded-xl hover:from-primary/90 hover:to-blue-600/90 transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <span>{isLastQuestion ? '見積り確認' : '次へ'}</span>
             <ArrowRight className="w-4 h-4" />
