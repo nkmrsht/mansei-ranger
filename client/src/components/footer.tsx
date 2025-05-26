@@ -23,13 +23,14 @@ export default function Footer() {
               />
               <div>
                 <h3 className="text-xl font-bold text-white">電化のマンセイ</h3>
-                <p className="text-sm text-white">エアコン取付だけも大歓迎！ネット購入・持込OK、明朗会計で安心</p>
+                <p className="text-sm text-white">エアコン取付だけも大歓迎！<br />
+                ネット購入・持込OK、明朗会計で安心</p>
               </div>
             </div>
             <div className="space-y-2">
               <p className="text-white">〒270-2241 千葉県松戸市松戸新田24</p>
               <p className="text-white">TEL : 047-364-8112</p>
-              <p className="text-white">営業時間 9:00〜18:00　土日祝は休みです</p>
+              <p className="text-white">営業時間 9:00〜18:00（土日祝休み）</p>
             </div>
           </div>
 
