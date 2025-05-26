@@ -120,24 +120,18 @@ export default function EstimateWizard() {
                     </p>
                   </div>
                   
-                  <div className="relative mb-4">
-                    <div className="absolute -top-1 -left-1 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">限定</span>
-                    </div>
+                  <div className="mb-4">
                     <div className="bg-white rounded-xl p-4 border border-white/50 shadow-sm">
                       <p className="text-red-600 font-bold text-lg mb-2 flex items-center justify-center">
                         <span className="mr-2">🎉</span>
                         キャンペーン特価
                       </p>
                       <div className="flex items-baseline justify-center space-x-3">
-                        <span className="text-3xl font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
                         <div className="flex flex-col">
                           <span className="text-xs text-gray-500">通常価格</span>
                           <span className="text-lg text-gray-500 line-through">¥{ORIGINAL_PRICE.toLocaleString()}</span>
                         </div>
-                        <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                          ¥{(ORIGINAL_PRICE - BASE_INSTALLATION_PRICE).toLocaleString()}お得
-                        </div>
+                        <span className="text-3xl font-bold text-primary">¥{BASE_INSTALLATION_PRICE.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
