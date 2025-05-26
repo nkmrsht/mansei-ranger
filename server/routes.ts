@@ -4,22 +4,22 @@ import { storage } from "./storage";
 import { handleJicooWebhook } from "./webhook-handlers";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Jicoo Webhook エンドポイント
-  app.post('/webhook/jicoo', handleJicooWebhook);
+  // Jicoo Webhook エンドポイント（APIルートとして）
+  app.post('/api/webhook/jicoo', handleJicooWebhook);
 
   // ヘルスチェック用エンドポイント
-  app.get('/webhook/status', (req, res) => {
+  app.get('/api/webhook/status', (req, res) => {
     res.json({
       status: 'active',
       timestamp: new Date().toISOString(),
       webhooks: {
-        jicoo: '/webhook/jicoo'
+        jicoo: '/api/webhook/jicoo'
       }
     });
   });
 
   // Webhookテスト用エンドポイント
-  app.post('/webhook/test', (req, res) => {
+  app.post('/api/webhook/test', (req, res) => {
     console.log('Webhookテスト受信:', JSON.stringify(req.body, null, 2));
     res.json({
       success: true,
