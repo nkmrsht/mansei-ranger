@@ -3,20 +3,20 @@ import { Star, User } from "lucide-react";
 export default function Reviews() {
   const reviews = [
     {
-      name: "松戸市 A様",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b977?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
+      name: "松戸市 Y・T様",
+      image: "",
       rating: 5,
       comment: "Amazonで買ったエアコンの取付をお願いしました。見積もりが明確で、当日も追加料金なし。手際よく丁寧に工事していただき、大満足です！"
     },
     {
-      name: "柏市 B様", 
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
+      name: "柏市 K・S様", 
+      image: "",
       rating: 5,
       comment: "他社では『取付だけ』を嫌がられましたが、こちらは快く引き受けてくれました。技術力も高く、地元の業者さんで安心感があります。"
     },
     {
-      name: "千葉市 C様",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
+      name: "市川市 M・H様",
+      image: "",
       rating: 5,
       comment: "急な依頼でしたが、翌日に来ていただけました。工事も丁寧で、アフターサポートの説明も詳しく、とても信頼できる業者さんです。"
     }
