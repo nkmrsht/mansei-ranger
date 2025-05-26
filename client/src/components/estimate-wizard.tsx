@@ -5,9 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
 import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
+import { saveEstimateData } from "@/lib/estimate-storage";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EstimateWizard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [isStarted, setIsStarted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -54,15 +57,53 @@ export default function EstimateWizard() {
 
   const handleNext = () => {
     if (isLastQuestion) {
-      // 見積り完了 - 確認画面へ
-      const total = calculateTotal();
-      // ここで見積り結果をstateやlocalStorageに保存
-      localStorage.setItem('estimateResult', JSON.stringify({
-        answers,
-        totalPrice: total,
-        basePrice: BASE_INSTALLATION_PRICE
-      }));
-      setLocation('/review');
+      // 見積り完了 - データを保存して確認画面へ
+      try {
+        const total = calculateTotal();
+        
+        // 詳細な回答データを作成
+        const detailedAnswers = answers.map(answer => {
+          const question = allQuestions.find(q => q.id === answer.questionId);
+          const option = question?.options[answer.selectedOption];
+          return {
+            questionId: answer.questionId,
+            selectedOption: answer.selectedOption,
+            optionLabel: option?.label || '',
+            price: option?.price || 0
+          };
+        });
+
+        // 見積りデータを保存
+        const estimateData = {
+          answers: detailedAnswers,
+          totalPrice: total,
+          basePrice: BASE_INSTALLATION_PRICE,
+          createdAt: new Date().toISOString()
+        };
+
+        const estimateId = saveEstimateData(estimateData);
+        
+        // 既存のlocalStorageも維持（既存機能との互換性のため）
+        localStorage.setItem('estimateResult', JSON.stringify({
+          answers,
+          totalPrice: total,
+          basePrice: BASE_INSTALLATION_PRICE
+        }));
+
+        toast({
+          title: "見積り完了！",
+          description: "見積り内容を保存しました。確認画面に移動します。",
+        });
+
+        setLocation('/review');
+      } catch (error) {
+        console.error('見積りデータの保存に失敗:', error);
+        toast({
+          title: "保存エラー",
+          description: "データの保存に失敗しました。もう一度お試しください。",
+          variant: "destructive"
+        });
+      }
     } else {
       setCurrentStep(prev => prev + 1);
     }
