@@ -57,41 +57,30 @@ export default function Process() {
             {/* 背景の装飾要素 */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-3xl"></div>
             
-            {/* 接続線とドット */}
-            <div className="absolute top-32 left-20 right-20 h-0.5 bg-gradient-to-r from-transparent via-primary/40 to-transparent z-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary to-primary/60 animate-pulse"></div>
-            </div>
+            {/* 接続線 */}
+            <div className="absolute top-32 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent z-0"></div>
             
-            <div className="grid lg:grid-cols-5 gap-8 relative z-10 py-12">
+            <div className="grid lg:grid-cols-5 gap-4 relative z-10 py-12">
               {steps.map((step, index) => (
-                <div key={index} className="text-center group">
-                  <div className="relative mb-8">
+                <div key={index} className="text-center group relative">
+                  <div className="relative mb-8 flex items-center justify-center">
                     {/* 番号サークル */}
-                    <div className="relative">
-                      <div className="w-24 h-24 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110">
-                        <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
-                        <span className="text-2xl font-bold text-white relative z-10">{step.number}</span>
-                      </div>
-                      
-                      {/* パルス効果 */}
-                      <div className="absolute inset-0 w-24 h-24 bg-primary/20 rounded-full mx-auto animate-ping opacity-75"></div>
-                      
-                      {/* 矢印アイコン */}
-                      {index < steps.length - 1 && (
-                        <div className="absolute top-8 -right-8 z-20">
-                          <div className="relative">
-                            <div className="w-16 h-16 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-gray-100/50">
-                              <div className="w-8 h-8 bg-gradient-to-r from-primary to-blue-600 rounded-full flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="absolute inset-0 w-16 h-16 bg-primary/10 rounded-full animate-ping"></div>
-                          </div>
-                        </div>
-                      )}
+                    <div className="w-24 h-24 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110">
+                      <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                      <span className="text-2xl font-bold text-white relative z-10">{step.number}</span>
                     </div>
+                    
+                    {/* パルス効果 */}
+                    <div className="absolute inset-0 w-24 h-24 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+                    
+                    {/* 矢印 - シンプルなSVGデザイン */}
+                    {index < steps.length - 1 && (
+                      <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-20">
+                        <svg className="w-8 h-8 text-primary animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90">
@@ -126,18 +115,11 @@ export default function Process() {
                   <div className="absolute inset-0 w-20 h-20 bg-primary/20 rounded-full animate-ping opacity-50"></div>
                   
                   {index < steps.length - 1 && (
-                    <div className="absolute top-20 left-10 flex flex-col items-center z-20">
-                      <div className="w-0.5 h-6 bg-gradient-to-b from-primary/60 to-primary/20"></div>
-                      <div className="relative">
-                        <div className="w-12 h-12 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-gray-100/50 mt-2">
-                          <div className="w-6 h-6 bg-gradient-to-b from-primary to-blue-600 rounded-full flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="absolute inset-0 w-12 h-12 bg-primary/10 rounded-full animate-ping mt-2"></div>
-                      </div>
+                    <div className="absolute top-20 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-20">
+                      <div className="w-0.5 h-8 bg-gradient-to-b from-primary/60 to-primary/20"></div>
+                      <svg className="w-6 h-6 text-primary animate-pulse mt-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
                     </div>
                   )}
                 </div>
