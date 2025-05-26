@@ -60,12 +60,12 @@ export default function Hero() {
             onClick={handleEstimateClick}
             className="bg-primary text-white px-12 py-6 rounded-full text-xl font-medium hover:bg-primary/90 transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center"
           >
-            <Calculator className="w-6 h-6" />
+            <Calculator className="w-8 h-8" />
             <span>見積り開始</span>
           </Button>
           <a href="tel:047-364-8112">
             <Button variant="outline" className="border-2 border-primary text-primary px-12 py-6 rounded-full text-xl font-medium hover:bg-primary hover:text-white transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center">
-              <Phone className="w-6 h-6" />
+              <Phone className="w-8 h-8" />
               <span>今すぐ電話</span>
             </Button>
           </a>
