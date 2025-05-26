@@ -5,14 +5,6 @@ import { ArrowLeft, Calendar } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Schedule() {
-  // URLパラメータから見積り金額を取得
-  const urlParams = new URLSearchParams(window.location.search);
-  const totalPrice = urlParams.get('total') || '0';
-  const basePrice = urlParams.get('base') || '0';
-  
-  // Jicoo URLに金額パラメータを追加
-  const jicooUrl = `https://www.jicoo.com/event_types/o-P4XTBDZeLW/widget?total=${totalPrice}&base=${basePrice}&estimate_total=¥${parseInt(totalPrice).toLocaleString()}`;
-
   useEffect(() => {
     // Jicooウィジェットのスクリプトを動的に読み込み
     const script = document.createElement('script');
@@ -59,20 +51,9 @@ export default function Schedule() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div 
                 className="jicoo-widget" 
-                data-url={jicooUrl}
+                data-url="https://www.jicoo.com/event_types/o-P4XTBDZeLW/widget" 
                 style={{minWidth: '320px', height: '720px', border: '1px solid #e4e4e4', boxSizing: 'content-box'}}
               ></div>
-            </div>
-            
-            {/* 見積り金額表示 */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-bold text-lg mb-2">お見積り金額</h3>
-              <p className="text-2xl font-bold text-primary">
-                ¥{parseInt(totalPrice).toLocaleString()}（税込）
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                この金額が予約確認メールに反映されます
-              </p>
             </div>
           </CardContent>
         </Card>
