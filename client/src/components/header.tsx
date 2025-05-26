@@ -17,7 +17,7 @@ export default function Header() {
           <img 
             src={logoMansei}
             alt="電化のマンセイ ロゴ"
-            className="w-12 h-12 object-contain"
+            className="w-16 h-16 object-contain"
           />
           <div>
             <h1 className="text-xl font-bold text-apple-text">電化のマンセイ</h1>
