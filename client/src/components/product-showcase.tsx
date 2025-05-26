@@ -53,17 +53,17 @@ export default function ProductShowcase() {
                 <div className="p-6">
                   <h3 className="text-lg font-bold mb-2">{product.name}</h3>
                   <p className="text-sm text-gray-600 mb-4">{product.specs}</p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold text-primary">{product.price}</span>
-                      <span className="text-xs text-gray-500 ml-1">(税込)</span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through ml-2">{product.originalPrice}</span>
-                      )}
+                  <div className="space-y-3">
+                    <div className="flex items-baseline justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-primary">{product.price}</span>
+                        <span className="text-xs text-gray-500 ml-1">(税込)</span>
+                      </div>
                     </div>
-                    <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-medium">
-                      {product.discount}
-                    </span>
+                    <div className="inline-flex items-center bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <span className="text-xs text-green-700 font-medium">工事費込み</span>
+                    </div>
                   </div>
                 </div>
               </div>
