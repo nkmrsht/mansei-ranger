@@ -39,14 +39,14 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6">
           <Button 
             onClick={handleEstimateClick}
-            className="bg-primary text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-primary/90 transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center"
+            className="bg-primary text-white px-12 py-6 rounded-full text-xl font-medium hover:bg-primary/90 transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center"
           >
-            <Calculator className="w-5 h-5" />
-            <span>無料見積り開始</span>
+            <Calculator className="w-6 h-6" />
+            <span>見積り開始</span>
           </Button>
           <a href="tel:047-123-4567">
-            <Button variant="outline" className="border-2 border-primary text-primary px-8 py-4 rounded-full text-lg font-medium hover:bg-primary hover:text-white transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center">
-              <Phone className="w-5 h-5" />
+            <Button variant="outline" className="border-2 border-primary text-primary px-12 py-6 rounded-full text-xl font-medium hover:bg-primary hover:text-white transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center">
+              <Phone className="w-6 h-6" />
               <span>今すぐ電話</span>
             </Button>
           </a>
