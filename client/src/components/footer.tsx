@@ -59,7 +59,7 @@ export default function Footer() {
                 onClick={handleEstimateClick}
                 className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary/90 transition-colors font-medium w-full"
               >
-                無料見積り
+                見積りシミュレーション
               </Button>
             </div>
           </div>
