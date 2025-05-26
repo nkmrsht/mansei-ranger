@@ -1,4 +1,4 @@
-import { Calculator, Calendar, MapPin, Wrench, Shield } from "lucide-react";
+import { Calculator, Calendar, MapPin, Wrench, Shield, ArrowRight, ChevronDown } from "lucide-react";
 
 export default function Process() {
   const steps = [
@@ -75,10 +75,10 @@ export default function Process() {
                       {/* パルス効果 */}
                       <div className="absolute inset-0 w-24 h-24 bg-primary/20 rounded-full mx-auto animate-ping opacity-75"></div>
                       
-                      {/* 接続ドット */}
+                      {/* 矢印アイコン */}
                       {index < steps.length - 1 && (
-                        <div className="absolute top-12 -right-4 w-8 h-8 bg-gradient-to-r from-primary/30 to-blue-600/30 rounded-full flex items-center justify-center backdrop-blur-sm">
-                          <div className="w-3 h-3 bg-gradient-to-r from-primary to-blue-600 rounded-full animate-pulse"></div>
+                        <div className="absolute top-10 -right-6 w-12 h-12 bg-gradient-to-r from-primary/20 to-blue-600/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
+                          <ArrowRight className="w-5 h-5 text-primary animate-pulse" />
                         </div>
                       )}
                     </div>
@@ -87,7 +87,9 @@ export default function Process() {
                   <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90">
                     <div className="mb-6 transform group-hover:scale-110 transition-transform duration-300">
                       <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-                        {step.icon}
+                        <div className="flex items-center justify-center w-full h-full">
+                          {step.icon}
+                        </div>
                       </div>
                     </div>
                     <h3 className="text-xl font-bold mb-4 text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
@@ -114,14 +116,21 @@ export default function Process() {
                   <div className="absolute inset-0 w-20 h-20 bg-primary/20 rounded-full animate-ping opacity-50"></div>
                   
                   {index < steps.length - 1 && (
-                    <div className="absolute top-20 left-10 w-0.5 h-12 bg-gradient-to-b from-primary/60 to-primary/20"></div>
+                    <div className="absolute top-20 left-10 flex flex-col items-center">
+                      <div className="w-0.5 h-8 bg-gradient-to-b from-primary/60 to-primary/20"></div>
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-blue-600/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 mt-2">
+                        <ChevronDown className="w-4 h-4 text-primary animate-bounce" />
+                      </div>
+                    </div>
                   )}
                 </div>
                 
                 <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl flex items-center justify-center mr-4">
-                      {step.icon}
+                      <div className="flex items-center justify-center w-full h-full">
+                        {step.icon}
+                      </div>
                     </div>
                     <h3 className="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
                   </div>
