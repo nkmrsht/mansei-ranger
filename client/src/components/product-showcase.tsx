@@ -62,7 +62,7 @@ export default function ProductShowcase() {
                     </div>
                     <div className="inline-flex items-center bg-green-50 border border-green-200 rounded-lg px-3 py-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                      <span className="text-xs text-green-700 font-medium">工事費込み</span>
+                      <span className="text-xs text-green-700 font-medium">標準取付工事費用込み</span>
                     </div>
                   </div>
                 </div>
