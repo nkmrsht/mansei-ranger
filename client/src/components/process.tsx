@@ -126,10 +126,8 @@ export default function Process() {
                 
                 <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
                   <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4">
-                      <div className="w-full h-full flex items-center justify-center">
-                        {step.icon}
-                      </div>
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4 flex items-center justify-center">
+                      {step.icon}
                     </div>
                     <h3 className="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
                   </div>
