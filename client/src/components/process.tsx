@@ -35,43 +35,63 @@ export default function Process() {
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-apple-text mb-6">
+    <section className="py-24 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center bg-primary/10 rounded-full px-6 py-2 mb-6">
+            <span className="text-primary font-semibold text-sm">簡単5ステップ</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             取付までの流れ
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            シンプルな5ステップで、スムーズにエアコン取付が完了
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            シンプルで分かりやすいプロセスで、<br className="hidden md:block" />
+            スムーズにエアコン取付が完了します
           </p>
         </div>
 
         {/* デスクトップ表示 */}
         <div className="hidden lg:block">
           <div className="relative">
-            {/* 接続線 */}
-            <div className="absolute top-20 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 z-0"></div>
+            {/* 背景の装飾要素 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-3xl"></div>
             
-            <div className="grid lg:grid-cols-5 gap-6 relative z-10">
+            {/* 接続線とドット */}
+            <div className="absolute top-32 left-20 right-20 h-0.5 bg-gradient-to-r from-transparent via-primary/40 to-transparent z-0">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary to-primary/60 animate-pulse"></div>
+            </div>
+            
+            <div className="grid lg:grid-cols-5 gap-8 relative z-10 py-12">
               {steps.map((step, index) => (
-                <div key={index} className="text-center">
-                  <div className="relative">
-                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      <span className="text-2xl font-bold text-white">{step.number}</span>
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className="absolute top-10 -right-3 w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                <div key={index} className="text-center group">
+                  <div className="relative mb-8">
+                    {/* 番号サークル */}
+                    <div className="relative">
+                      <div className="w-24 h-24 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110">
+                        <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                        <span className="text-2xl font-bold text-white relative z-10">{step.number}</span>
                       </div>
-                    )}
+                      
+                      {/* パルス効果 */}
+                      <div className="absolute inset-0 w-24 h-24 bg-primary/20 rounded-full mx-auto animate-ping opacity-75"></div>
+                      
+                      {/* 接続ドット */}
+                      {index < steps.length - 1 && (
+                        <div className="absolute top-12 -right-4 w-8 h-8 bg-gradient-to-r from-primary/30 to-blue-600/30 rounded-full flex items-center justify-center backdrop-blur-sm">
+                          <div className="w-3 h-3 bg-gradient-to-r from-primary to-blue-600 rounded-full animate-pulse"></div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   
-                  <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:scale-105">
-                    <div className="mb-4">
-                      {step.icon}
+                  <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90">
+                    <div className="mb-6 transform group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl flex items-center justify-center mx-auto">
+                        {step.icon}
+                      </div>
                     </div>
-                    <h3 className="text-lg font-bold mb-3 text-gray-800">{step.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -81,27 +101,42 @@ export default function Process() {
 
         {/* モバイル・タブレット表示 */}
         <div className="lg:hidden">
-          <div className="space-y-6">
+          <div className="space-y-8">
             {steps.map((step, index) => (
-              <div key={index} className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-xl font-bold text-white">{step.number}</span>
+              <div key={index} className="flex items-start space-x-6 group">
+                <div className="flex-shrink-0 relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                    <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                    <span className="text-xl font-bold text-white relative z-10">{step.number}</span>
                   </div>
+                  
+                  {/* パルス効果 */}
+                  <div className="absolute inset-0 w-20 h-20 bg-primary/20 rounded-full animate-ping opacity-50"></div>
+                  
                   {index < steps.length - 1 && (
-                    <div className="w-0.5 h-8 bg-gradient-to-b from-primary to-primary/30 mx-auto mt-4"></div>
+                    <div className="absolute top-20 left-10 w-0.5 h-12 bg-gradient-to-b from-primary/60 to-primary/20"></div>
                   )}
                 </div>
                 
-                <div className="flex-1 bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                  <div className="flex items-center mb-3">
-                    {step.icon}
-                    <h3 className="text-lg font-bold ml-3 text-gray-800">{step.title}</h3>
+                <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl flex items-center justify-center mr-4">
+                      {step.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
                   </div>
                   <p className="text-gray-600 leading-relaxed">{step.description}</p>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* 底部の装飾要素 */}
+        <div className="text-center mt-16">
+          <div className="inline-flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-gray-700 font-medium">最短当日対応可能</span>
           </div>
         </div>
       </div>
