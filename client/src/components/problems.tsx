@@ -47,7 +47,7 @@ export default function Problems() {
                 {problem.icon}
               </div>
               <h3 className="text-lg font-bold mb-3">{problem.title}</h3>
-              <div className="text-gray-600 whitespace-pre-line">{problem.description}</div>
+              <div className="text-gray-600">{problem.description}</div>
             </div>
           ))}
         </div>
