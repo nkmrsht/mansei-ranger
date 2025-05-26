@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, User } from "lucide-react";
 
 export default function Reviews() {
   const reviews = [
@@ -38,11 +38,9 @@ export default function Reviews() {
           {reviews.map((review, index) => (
             <div key={index} className="bg-gray-50 p-6 rounded-2xl border border-apple-border">
               <div className="flex items-center mb-4">
-                <img 
-                  src={review.image}
-                  alt={`${review.name}の顔写真`}
-                  className="w-12 h-12 rounded-full object-cover mr-4" 
-                />
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                  <User className="w-6 h-6 text-gray-500" />
+                </div>
                 <div>
                   <h4 className="font-bold">{review.name}</h4>
                   <div className="flex text-yellow-400">
