@@ -115,7 +115,7 @@ export default function Process() {
                 
                 <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
                   <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4 flex items-center justify-center flex-shrink-0 text-primary text-xl p-2">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4 flex items-center justify-center flex-shrink-0 text-primary text-xl p-3">
                       <div className="flex items-center justify-center w-full h-full" style={{lineHeight: '0'}}>
                         {step.icon}
                       </div>
