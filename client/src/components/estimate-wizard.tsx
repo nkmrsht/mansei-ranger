@@ -126,8 +126,8 @@ export default function EstimateWizard() {
                         <span className="mr-2">🎉</span>
                         キャンペーン特価
                       </p>
-                      <div className="flex items-baseline justify-center space-x-3">
-                        <div className="flex flex-col">
+                      <div className="flex items-center justify-center space-x-3">
+                        <div className="flex flex-col items-center">
                           <span className="text-xs text-gray-500">通常価格</span>
                           <span className="text-lg text-gray-500 line-through">¥{ORIGINAL_PRICE.toLocaleString()}</span>
                         </div>
