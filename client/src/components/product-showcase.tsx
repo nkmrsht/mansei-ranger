@@ -26,14 +26,7 @@ export default function ProductShowcase() {
       discount: "27%OFF",
       image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
     },
-    {
-      name: "シャープ AY-P28H",
-      specs: "10畳用・プラズマクラスター",
-      price: "¥87,800",
-      originalPrice: "¥115,000",
-      discount: "24%OFF",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
-    }
+
   ];
 
   return (
@@ -48,9 +41,9 @@ export default function ProductShowcase() {
           </p>
         </div>
 
-        <div className="flex space-x-6 overflow-x-auto pb-6 scrollbar-hide">
+        <div className="grid md:grid-cols-3 gap-6">
           {products.map((product, index) => (
-            <div key={index} className="flex-shrink-0 w-80">
+            <div key={index}>
               <div className="bg-white rounded-2xl shadow-sm border border-apple-border overflow-hidden">
                 <img 
                   src={product.image}
