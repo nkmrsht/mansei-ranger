@@ -143,7 +143,7 @@ export default function EstimateWizard() {
                 
                 <Button 
                   onClick={() => setIsStarted(true)}
-                  className="bg-gradient-to-r from-primary to-blue-600 text-white px-16 py-6 rounded-3xl text-xl font-bold hover:from-primary/90 hover:to-blue-600/90 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl w-full max-w-sm"
+                  className="bg-gradient-to-r from-primary to-blue-600 text-white px-16 py-6 rounded-3xl hover:from-primary/90 hover:to-blue-600/90 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl w-full max-w-sm pt-[30px] pb-[30px] text-[21px] font-bold"
                 >
                   <span className="flex items-center justify-center space-x-3">
                     <span>見積り開始</span>
