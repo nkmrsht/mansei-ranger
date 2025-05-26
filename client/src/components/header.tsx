@@ -1,5 +1,6 @@
 import { Phone, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoMansei from "../assets/images/logo-mansei.jpg";
 
 export default function Header() {
   const handleEstimateClick = () => {
@@ -13,9 +14,11 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md z-50 border-b border-apple-border">
       <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-            <Zap className="w-6 h-6 text-white" />
-          </div>
+          <img 
+            src={logoMansei}
+            alt="電化のマンセイ ロゴ"
+            className="w-12 h-12 object-contain"
+          />
           <div>
             <h1 className="text-xl font-bold text-apple-text">電化のマンセイ</h1>
             <p className="text-sm text-gray-600">エアコン取付だけも大歓迎！ネット購入・持込OK、明朗会計で安心</p>
