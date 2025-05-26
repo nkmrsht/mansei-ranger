@@ -203,7 +203,7 @@ export default function Review() {
               <span>見積りを修正する</span>
             </Button>
           </Link>
-          <Link href="/schedule">
+          <Link href={`/schedule?total=${estimateResult.totalPrice}&base=${BASE_INSTALLATION_PRICE}`}>
             <Button className="bg-primary text-white w-full sm:w-auto px-8 py-3 hover:bg-primary/90">
               この内容で予約に進む
             </Button>
