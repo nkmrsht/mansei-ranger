@@ -68,9 +68,20 @@ export default function ProductShowcase() {
           ))}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-12">
+          <div className="max-w-3xl mx-auto mb-8">
+            <p className="text-lg text-gray-700 mb-4">
+              畳用以外にも、4.5畳～20畳まで全サイズ・全メーカーを取り扱いしています。<br />
+              お部屋の広さやご予算、ご希望の機能・メーカーなどに合わせて、<br />
+              あなたにピッタリの機種をご提案します！
+            </p>
+            <p className="text-base text-gray-600">
+              「ネットにない型番」「他店で見かけたモデル」「最新の高性能機種」などもOK。<br />
+              お気軽にご相談ください。
+            </p>
+          </div>
           <Button className="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
-            全商品を見る
+            まずは相談から始める
           </Button>
         </div>
       </div>
