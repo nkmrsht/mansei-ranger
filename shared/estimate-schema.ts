@@ -114,19 +114,6 @@ export const estimateData: EstimateSection[] = [
           reason: "取り外し・処分の有無で作業内容と金額が変わります。",
           guide: "分からなければ「不要」でもOK。"
         }
-      },
-      {
-        id: "2-2",
-        question: "リサイクル券はお持ちですか？",
-        options: [
-          { label: "持っている", price: 0 },
-          { label: "当日用意してほしい", price: 2200 },
-          { label: "わからない", price: 0 }
-        ],
-        help: {
-          reason: "法律でエアコンの処分に必要です。",
-          guide: "不明な場合は「わからない」または「当日用意」でOK。"
-        }
       }
     ]
   },
