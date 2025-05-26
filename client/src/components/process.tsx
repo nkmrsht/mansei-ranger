@@ -78,8 +78,10 @@ export default function Process() {
                   
                   <div className="bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg border border-white/20 hover:shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:bg-white/90 h-72 flex flex-col">
                     <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl mx-auto flex items-center justify-center text-primary text-2xl">
-                        {step.icon}
+                      <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-blue-100 rounded-2xl mx-auto flex items-center justify-center text-primary text-2xl pt-6 pb-2 px-2">
+                        <div className="flex items-center justify-center w-full h-full" style={{lineHeight: '0'}}>
+                          {step.icon}
+                        </div>
                       </div>
                     </div>
                     <h3 className="text-lg font-bold mb-3 text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
