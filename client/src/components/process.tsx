@@ -70,13 +70,12 @@ export default function Process() {
                       <span className="text-2xl font-bold text-white relative z-10">{step.number}</span>
                     </div>
                     
-                    {/* パルス効果 */}
-                    <div className="absolute inset-0 w-24 h-24 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+
                     
                     {/* 矢印 - シンプルなSVGデザイン */}
                     {index < steps.length - 1 && (
                       <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-20">
-                        <svg className="w-8 h-8 text-primary animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                       </div>
@@ -111,13 +110,12 @@ export default function Process() {
                     <span className="text-xl font-bold text-white relative z-10">{step.number}</span>
                   </div>
                   
-                  {/* パルス効果 */}
-                  <div className="absolute inset-0 w-20 h-20 bg-primary/20 rounded-full animate-ping opacity-50"></div>
+
                   
                   {index < steps.length - 1 && (
                     <div className="absolute top-20 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-20">
                       <div className="w-0.5 h-8 bg-gradient-to-b from-primary/60 to-primary/20"></div>
-                      <svg className="w-6 h-6 text-primary animate-pulse mt-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-primary mt-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                     </div>
@@ -141,7 +139,7 @@ export default function Process() {
         {/* 底部の装飾要素 */}
         <div className="text-center mt-16">
           <div className="inline-flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-gray-700 font-medium">最短当日対応可能</span>
           </div>
         </div>
