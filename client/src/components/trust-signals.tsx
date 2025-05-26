@@ -45,20 +45,20 @@ export default function TrustSignals() {
 
   const staff = [
     {
-      name: "田中 一郎",
-      position: "代表取締役",
+      name: "武田 修治",
+      position: "代表取締役 / 電気工事士",
       image: staffLeaderImage,
       comment: "お客様の快適な暮らしを第一に、誠実な工事を心がけています"
     },
     {
-      name: "佐藤 二郎",
-      position: "技術長・電気工事士",
+      name: "武田 憲宜",
+      position: "統括部長 / 電気工事士",
       image: staffSatoImage,
       comment: "安全で確実な工事を通じて、地域の皆様に貢献したいと思います"
     },
     {
-      name: "鈴木 三郎",
-      position: "工事主任",
+      name: "下舘 幸大",
+      position: "工事主任 / 電気工事士",
       image: staffSuzukiImage,
       comment: "細部まで丁寧な施工で、お客様に満足いただける仕上がりを目指します"
     }
@@ -95,7 +95,7 @@ export default function TrustSignals() {
                 src={member.image}
                 alt={`${member.name}の顔写真`}
                 className={`w-20 h-20 rounded-full mx-auto mb-4 object-cover ${
-                  member.name === "鈴木 三郎" ? "bg-blue-100" : ""
+                  member.name === "下舘 幸大" ? "bg-blue-100" : ""
                 }`}
               />
               <h4 className="font-bold text-lg mb-2">{member.name}</h4>
