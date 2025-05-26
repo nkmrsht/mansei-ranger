@@ -1,6 +1,23 @@
 // Jicoo Webhook処理用のハンドラー
 import type { Request, Response } from 'express';
 
+// EmailJSの設定情報（Replitの環境変数から取得）
+const emailJSConfig = {
+  serviceId: process.env.EMAILJS_SERVICE_ID || "your_service_id",
+  templateId: process.env.EMAILJS_TEMPLATE_ID || "your_template_id", 
+  publicKey: process.env.EMAILJS_PUBLIC_KEY || "your_public_key"
+};
+
+// 設定チェック関数
+function isEmailJSConfigured(): boolean {
+  return emailJSConfig.serviceId !== "your_service_id" &&
+         emailJSConfig.templateId !== "your_template_id" &&
+         emailJSConfig.publicKey !== "your_public_key" &&
+         Boolean(emailJSConfig.serviceId) &&
+         Boolean(emailJSConfig.templateId) &&
+         Boolean(emailJSConfig.publicKey);
+}
+
 export interface JicooWebhookData {
   event: string;
   data: {
@@ -42,16 +59,23 @@ export interface EstimateWebhookData {
 // EmailJS送信用の関数
 async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
   try {
-    // EmailJSの動的インポート（サーバーサイドでは別の方法が必要）
-    // ここではfetchを使用してEmailJSのAPIに直接リクエスト
+    // EmailJS設定チェック
+    if (!isEmailJSConfigured()) {
+      console.warn('EmailJS設定が不完全です:', {
+        serviceId: emailJSConfig.serviceId === "your_service_id" ? '未設定' : '設定済み',
+        templateId: emailJSConfig.templateId === "your_template_id" ? '未設定' : '設定済み',
+        publicKey: emailJSConfig.publicKey === "your_public_key" ? '未設定' : '設定済み'
+      });
+      return false;
+    }
     
     const customer = jicooData.data.attendees[0]; // 最初の参加者をお客様とする
     const reservationDate = new Date(jicooData.data.start_time);
     
     const emailData = {
-      service_id: process.env.EMAILJS_SERVICE_ID,
-      template_id: process.env.EMAILJS_TEMPLATE_ID,
-      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      service_id: emailJSConfig.serviceId,
+      template_id: emailJSConfig.templateId,
+      user_id: emailJSConfig.publicKey,
       template_params: {
         to_email: customer?.email || 'info@d-mansei.co.jp',
         customer_name: customer?.name || 'お客様',
@@ -73,6 +97,12 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
       }
     };
 
+    console.log('EmailJS送信中...', {
+      serviceId: emailJSConfig.serviceId,
+      templateId: emailJSConfig.templateId,
+      customerEmail: customer?.email
+    });
+
     const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
@@ -82,14 +112,19 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
     });
 
     if (response.ok) {
-      console.log('確認メール送信成功');
+      console.log('EmailJS送信成功');
       return true;
     } else {
-      console.error('確認メール送信失敗:', response.status, await response.text());
+      const errorText = await response.text();
+      console.error('EmailJS送信失敗:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
       return false;
     }
   } catch (error) {
-    console.error('確認メール送信エラー:', error);
+    console.error('EmailJS送信エラー:', error);
     return false;
   }
 }
@@ -97,10 +132,24 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
 // Web3Forms送信用の代替関数
 async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
   try {
+    const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+    
+    if (!accessKey || accessKey === "your_access_key") {
+      console.warn('Web3Forms設定が不完全です:', {
+        accessKey: accessKey ? '設定済み' : '未設定'
+      });
+      return false;
+    }
+    
     const customer = jicooData.data.attendees[0];
     const reservationDate = new Date(jicooData.data.start_time);
     
     const emailContent = generateEmailTemplate(jicooData, estimateData);
+    
+    console.log('Web3Forms送信中...', {
+      customerEmail: customer?.email,
+      hasAccessKey: Boolean(accessKey)
+    });
     
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
@@ -108,7 +157,7 @@ async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estim
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        access_key: process.env.WEB3FORMS_ACCESS_KEY,
+        access_key: accessKey,
         name: customer?.name || 'お客様',
         email: customer?.email || 'info@d-mansei.co.jp',
         subject: 'エアコン取付工事 見積り・予約完了のお知らせ',
@@ -122,7 +171,12 @@ async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estim
       console.log('Web3Forms送信成功');
       return true;
     } else {
-      console.error('Web3Forms送信失敗:', response.status);
+      const errorText = await response.text();
+      console.error('Web3Forms送信失敗:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
       return false;
     }
   } catch (error) {
@@ -264,15 +318,26 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     // 確認メール送信（EmailJSまたはWeb3Formsを使用）
     let emailSuccess = false;
     
-    // 環境変数に応じてメール送信方法を選択
-    if (process.env.EMAILJS_SERVICE_ID) {
+    console.log('メール送信設定確認:', {
+      emailJSConfigured: isEmailJSConfigured(),
+      web3FormsConfigured: Boolean(process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key"),
+      emailJSServiceId: emailJSConfig.serviceId === "your_service_id" ? '未設定' : '設定済み',
+      web3FormsKey: process.env.WEB3FORMS_ACCESS_KEY ? '設定済み' : '未設定'
+    });
+    
+    // EmailJSを優先して使用
+    if (isEmailJSConfigured()) {
       console.log('EmailJSでメール送信中...');
       emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
-    } else if (process.env.WEB3FORMS_ACCESS_KEY) {
+    } 
+    // EmailJSが設定されていない場合はWeb3Formsを試行
+    else if (process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key") {
       console.log('Web3Formsでメール送信中...');
       emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
-    } else {
-      console.warn('メール送信設定がありません');
+    } 
+    // どちらも設定されていない場合
+    else {
+      console.warn('メール送信設定がありません。EmailJSまたはWeb3FormsのAPIキーが必要です。');
     }
 
     // レスポンス返却

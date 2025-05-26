@@ -18,15 +18,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Webhookテスト用エンドポイント
-  app.post('/api/webhook/test', (req, res) => {
-    console.log('Webhookテスト受信:', JSON.stringify(req.body, null, 2));
-    res.json({
-      success: true,
-      message: 'Test webhook received successfully',
-      receivedData: req.body,
-      timestamp: new Date().toISOString()
-    });
+  // Jicoo Webhookテスト用エンドポイント（実際のJicooデータ形式でテスト）
+  app.post('/api/webhook/test', async (req, res) => {
+    console.log('Jicoo Webhookテスト受信:', JSON.stringify(req.body, null, 2));
+    
+    // テスト用のJicooデータがない場合はサンプルデータを使用
+    const testJicooData = req.body.event ? req.body : {
+      event: 'booking.created',
+      data: {
+        id: 'test-reservation-' + Date.now(),
+        title: 'エアコン取付工事',
+        start_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        end_time: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+        timezone: 'Asia/Tokyo',
+        attendees: [
+          {
+            name: 'テスト太郎',
+            email: 'test@example.com',
+            status: 'confirmed'
+          }
+        ],
+        host: {
+          name: '電化のマンセイ',
+          email: 'info@d-mansei.co.jp'
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    };
+    
+    // 実際のJicooハンドラーを呼び出してテスト
+    try {
+      await handleJicooWebhook({ ...req, body: testJicooData } as any, res);
+    } catch (error) {
+      console.error('テストWebhook処理エラー:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Test webhook processing failed',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   });
 
   // 見積りデータ取得API（オプション）
