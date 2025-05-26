@@ -30,9 +30,7 @@ export default function Hero() {
         </p>
         
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-12 max-w-3xl mx-auto">
-          <p className="text-lg font-semibold text-gray-800 mb-2">
-            明朗会計＆最短当日工事、創業50年の地元密着で安心サポート。
-          </p>
+          <p className="text-lg font-semibold text-gray-800 mb-2">明朗会計＆最短当日工事、創業54年の地元密着で安心サポート。</p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
             <span className="flex items-center">
               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
