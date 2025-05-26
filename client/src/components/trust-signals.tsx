@@ -94,7 +94,9 @@ export default function TrustSignals() {
               <img 
                 src={member.image}
                 alt={`${member.name}の顔写真`}
-                className="w-20 h-20 rounded-full mx-auto mb-4 object-cover" 
+                className={`w-20 h-20 rounded-full mx-auto mb-4 object-cover ${
+                  member.name === "鈴木 三郎" ? "bg-blue-100" : ""
+                }`}
               />
               <h4 className="font-bold text-lg mb-2">{member.name}</h4>
               <p className="text-sm text-gray-600 mb-2">{member.position}</p>
