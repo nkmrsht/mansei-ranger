@@ -133,12 +133,7 @@ export default function Process() {
           </div>
         </div>
 
-        {/* 底部の装飾要素 */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
-            <span className="text-gray-700 font-medium">最短当日対応可能</span>
-          </div>
-        </div>
+
       </div>
     </section>
   );
