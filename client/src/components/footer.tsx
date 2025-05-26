@@ -13,9 +13,9 @@ export default function Footer() {
   return (
     <footer className="py-16 mb-16 md:mb-0" style={{backgroundColor: '#333', color: '#FFF'}}>
       <div className="max-w-6xl mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <div className="flex items-center space-x-3 mb-4">
               <img 
                 src={logoMansei}
                 alt="電化のマンセイ ロゴ"
