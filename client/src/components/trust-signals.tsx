@@ -44,7 +44,7 @@ export default function TrustSignals() {
     {
       name: "田中 一郎",
       position: "代表取締役",
-      image: "/images/IMG_3650_fix.jpg",
+      image: "/images/staff-leader.jpg",
       comment: "お客様の快適な暮らしを第一に、誠実な工事を心がけています"
     },
     {
