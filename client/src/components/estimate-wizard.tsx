@@ -123,7 +123,6 @@ export default function EstimateWizard() {
                   <div className="mb-4">
                     <div className="bg-white rounded-xl p-4 border border-white/50 shadow-sm">
                       <p className="text-red-600 font-bold text-lg mb-2 flex items-center justify-center">
-                        <span className="mr-2">🎉</span>
                         キャンペーン特価
                       </p>
                       <div className="flex items-center justify-center space-x-3">
