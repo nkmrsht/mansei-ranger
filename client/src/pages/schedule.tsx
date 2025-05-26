@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Schedule() {
   const { toast } = useToast();
   const [emailStatus, setEmailStatus] = useState<'pending' | 'sending' | 'sent' | 'failed'>('pending');
-  const [estimateData, setEstimateData] = useState(null);
+  const [estimateData, setEstimateData] = useState<any>(null);
 
   useEffect(() => {
     // 見積りデータを取得
