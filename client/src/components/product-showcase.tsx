@@ -71,7 +71,7 @@ export default function ProductShowcase() {
         <div className="text-center mt-12">
           <div className="max-w-3xl mx-auto mb-8">
             <p className="text-lg text-gray-700 mb-4">
-              畳用以外にも、4.5畳～20畳まで全サイズ・全メーカーを取り扱いしています。<br />
+              6畳以外にも、8畳～20畳まで全サイズ・全メーカーを取り扱いしています。<br />
               お部屋の広さやご予算、ご希望の機能・メーカーなどに合わせて、<br />
               あなたにピッタリの機種をご提案します！
             </p>
