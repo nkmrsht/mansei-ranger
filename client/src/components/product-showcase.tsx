@@ -44,16 +44,16 @@ export default function ProductShowcase() {
         <div className="grid md:grid-cols-3 gap-6">
           {products.map((product, index) => (
             <div key={index}>
-              <div className="bg-white rounded-2xl shadow-sm border border-apple-border overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm border border-apple-border overflow-hidden h-full flex flex-col">
                 <img 
                   src={product.image}
                   alt={product.name}
                   className="w-full h-48 object-cover" 
                 />
-                <div className="p-6">
+                <div className="p-6 flex flex-col flex-1">
                   <h3 className="text-lg font-bold mb-2">{product.name}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{product.specs}</p>
-                  <div className="space-y-3">
+                  <p className="text-sm text-gray-600 mb-4 flex-1">{product.specs}</p>
+                  <div className="space-y-3 mt-auto">
                     <div className="flex items-baseline justify-between">
                       <div>
                         <span className="text-2xl font-bold text-primary">{product.price}</span>
