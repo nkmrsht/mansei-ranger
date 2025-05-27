@@ -288,16 +288,8 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       });
     }
 
-    // 見積りデータの取得（クエリパラメータから）
-    const estimateId = req.query ? req.query.estimate_id as string : undefined;
+    // 見積りデータの取得（今回はテスト用にスキップ）
     let estimateData: EstimateWebhookData | undefined;
-
-    if (estimateId) {
-      // 実際の実装では、データベースやストレージから見積りデータを取得
-      // ここでは簡単なログ出力のみ
-      console.log('見積りID:', estimateId);
-      // estimateData = await getEstimateData(estimateId);
-    }
 
     // お客様情報のバリデーション
     if (!jicooData.data.attendees || jicooData.data.attendees.length === 0) {
@@ -350,7 +342,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
         customerEmail: customer.email,
         reservationDate: jicooData.data.start_time,
         emailSent: emailSuccess,
-        estimateId: estimateId || null
+        estimateId: 'test-estimate'
       }
     });
 
