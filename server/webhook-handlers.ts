@@ -346,9 +346,9 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     // 公式仕様の形式をチェック
     if (req.body.event_type && req.body.booking) {
       console.log('✅ Jicoo公式仕様形式を検出');
-      jicooData = req.body;
-      eventType = jicooData.event_type;
-      bookingData = jicooData.booking;
+      eventType = req.body.event_type;
+      bookingData = req.body.booking;
+      console.log('公式仕様 eventType:', eventType);
     } 
     // テスト用の旧形式にも対応
     else if (req.body.event && req.body.data) {
@@ -373,6 +373,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     }
     
     // 対応するイベントタイプをチェック
+    console.log('受信イベントタイプ:', eventType);
     if (eventType !== 'booking.created' && eventType !== 'booking_created' && eventType !== 'appointment.booked') {
       console.log('処理対象外のイベント:', eventType);
       return res.status(200).json({ 
@@ -470,12 +471,12 @@ export async function handleJicooWebhook(req: Request, res: Response) {
           updated_at: bookingData.updated_at
         }
       };
-      emailSuccess = await sendConfirmationEmailWeb3Forms(adaptedJicooData, estimateData);
+      emailSuccess = await sendConfirmationEmailWeb3Forms(adaptedJicooData as any, estimateData);
       
       if (!emailSuccess) {
         console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
         if (hasEmailJS) {
-          emailSuccess = await sendConfirmationEmail(adaptedJicooData, estimateData);
+          emailSuccess = await sendConfirmationEmail(adaptedJicooData as any, estimateData);
         }
       }
     } 
@@ -495,24 +496,25 @@ export async function handleJicooWebhook(req: Request, res: Response) {
           updated_at: bookingData.updated_at
         }
       };
-      emailSuccess = await sendConfirmationEmail(adaptedJicooData, estimateData);
+      emailSuccess = await sendConfirmationEmail(adaptedJicooData as any, estimateData);
     } 
     // どちらも設定されていない場合
     else {
       console.warn('メール送信設定がありません。Web3FormsまたはEmailJSのAPIキーが必要です。');
     }
 
-    // レスポンス返却
+    // レスポンス返却（公式仕様対応）
     res.status(200).json({
       success: true,
       message: 'Webhook processed successfully',
       data: {
-        reservationId: jicooData.data.id,
+        reservationId: bookingData.id,
         customerName: customer.name,
         customerEmail: customer.email,
-        reservationDate: jicooData.data.start_time,
+        reservationDate: bookingData.start_at,
         emailSent: emailSuccess,
-        estimateId: estimateId || null
+        estimateId: estimateId || null,
+        eventType: eventType
       }
     });
 
