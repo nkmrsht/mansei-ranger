@@ -20,31 +20,60 @@ function isEmailJSConfigured(): boolean {
 
 // Jicoo公式仕様に基づくWebhookデータ型定義
 export interface JicooWebhookData {
-  event_type: string; // 公式仕様では event_type
-  booking: {
-    id: string;
-    event_type_id: string;
-    start_at: string; // 公式仕様では start_at
-    end_at: string;   // 公式仕様では end_at
-    timezone: string;
+  // 新しい公式仕様（推奨）
+  event_type?: 'booking.created' | 'booking.updated' | 'guest_cancelled' | 'host_cancelled';
+  booking?: {
+    uid: string;
+    eventTypeUid: string;
+    startedAt: string; // ISO 8601形式
+    endedAt: string;   // ISO 8601形式
+    timeZone: string;
     location?: string;
-    description?: string;
-    attendee: {
+    status: 'confirmed' | 'cancel';
+    contact: {
       name: string;
       email: string;
-      phone?: string;
     };
+    answers?: Array<{
+      question: string;
+      content: string[];
+    }>;
+    tracking?: {
+      utm_campaign?: string;
+      utm_source?: string;
+      utm_medium?: string;
+      utm_content?: string;
+      utm_term?: string;
+    };
+    createdAt: string;
+    updatedAt: string;
+    cancelledAt?: string;
+    cancelledBy?: 'guest' | 'host';
+    cancelReason?: string;
+  };
+  
+  // 旧形式との互換性（テスト用）
+  event?: string;
+  data?: {
+    id: string;
+    title?: string;
+    start_time: string;
+    end_time: string;
+    timezone: string;
+    attendees: Array<{
+      name: string;
+      email: string;
+      status?: string;
+    }>;
     host: {
       name: string;
       email: string;
     };
     created_at: string;
     updated_at: string;
-    canceled_at?: string;
   };
-  // 旧形式との互換性のため
-  event?: string;
-  data?: any;
+  
+  createdAt?: string; // Webhook送信時刻
 }
 
 export interface EstimateWebhookData {
@@ -61,6 +90,60 @@ export interface EstimateWebhookData {
   createdAt: string;
 }
 
+// Webhookデータから統一された予約情報を抽出
+function extractBookingInfo(webhookData: JicooWebhookData) {
+  // 新しい公式仕様の場合
+  if (webhookData.event_type && webhookData.booking) {
+    return {
+      id: webhookData.booking.uid,
+      eventType: webhookData.event_type,
+      startTime: webhookData.booking.startedAt,
+      endTime: webhookData.booking.endedAt,
+      timezone: webhookData.booking.timeZone,
+      location: webhookData.booking.location,
+      status: webhookData.booking.status,
+      customer: {
+        name: webhookData.booking.contact.name,
+        email: webhookData.booking.contact.email,
+      },
+      answers: webhookData.booking.answers || [],
+      tracking: webhookData.booking.tracking,
+      createdAt: webhookData.booking.createdAt,
+      updatedAt: webhookData.booking.updatedAt,
+      cancelledAt: webhookData.booking.cancelledAt,
+      cancelledBy: webhookData.booking.cancelledBy,
+      cancelReason: webhookData.booking.cancelReason
+    };
+  }
+  
+  // 旧形式の場合（テスト用）
+  if (webhookData.event && webhookData.data) {
+    const customer = webhookData.data.attendees?.[0];
+    return {
+      id: webhookData.data.id,
+      eventType: webhookData.event,
+      startTime: webhookData.data.start_time,
+      endTime: webhookData.data.end_time,
+      timezone: webhookData.data.timezone,
+      location: undefined,
+      status: 'confirmed' as const,
+      customer: {
+        name: customer?.name || 'お客様',
+        email: customer?.email || '',
+      },
+      answers: [],
+      tracking: undefined,
+      createdAt: webhookData.data.created_at,
+      updatedAt: webhookData.data.updated_at,
+      cancelledAt: undefined,
+      cancelledBy: undefined,
+      cancelReason: undefined
+    };
+  }
+  
+  throw new Error('Invalid webhook data format');
+}
+
 // EmailJS送信用の関数
 async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
   try {
@@ -74,17 +157,17 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
       return false;
     }
     
-    const customer = jicooData.data.attendees[0]; // 最初の参加者をお客様とする
-    const reservationDate = new Date(jicooData.data.start_time);
+    const bookingInfo = extractBookingInfo(jicooData);
+    const reservationDate = new Date(bookingInfo.startTime);
     
     const emailData = {
       service_id: emailJSConfig.serviceId,
       template_id: emailJSConfig.templateId,
       user_id: emailJSConfig.publicKey,
       template_params: {
-        to_email: customer?.email || 'info@d-mansei.co.jp',
-        customer_name: customer?.name || 'お客様',
-        reservation_id: jicooData.data.id,
+        to_email: bookingInfo.customer.email || 'info@d-mansei.co.jp',
+        customer_name: bookingInfo.customer.name || 'お客様',
+        reservation_id: bookingInfo.id,
         reservation_date: reservationDate.toLocaleDateString('ja-JP'),
         reservation_time: reservationDate.toLocaleTimeString('ja-JP', { 
           hour: '2-digit', 
@@ -105,7 +188,8 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
     console.log('EmailJS送信中...', {
       serviceId: emailJSConfig.serviceId,
       templateId: emailJSConfig.templateId,
-      customerEmail: customer?.email
+      customerEmail: bookingInfo.customer.email,
+      eventType: bookingInfo.eventType
     });
 
     const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -134,118 +218,12 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
   }
 }
 
-// Web3Forms両方向送信用関数（緊急修正版）
-async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
-  try {
-    const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
-    
-    if (!accessKey || accessKey === "your_access_key") {
-      console.warn('Web3Forms設定が不完全です:', {
-        accessKey: accessKey ? '設定済み' : '未設定'
-      });
-      return false;
-    }
-    
-    const customer = jicooData.data.attendees[0];
-    const emailContent = generateEmailTemplate(jicooData, estimateData);
-    
-    let customerSuccess = false;
-    let adminSuccess = false;
-    
-    // 1. お客様向けメール送信
-    console.log('お客様向け送信中...', {
-      customerEmail: customer?.email,
-      hasAccessKey: Boolean(accessKey)
-    });
-    
-    try {
-      const customerResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: accessKey,
-          name: customer?.name || 'お客様',
-          email: customer?.email,
-          subject: 'エアコン取付工事 予約完了のお知らせ',
-          message: emailContent,
-          from_name: '電化のマンセイ',
-          replyto: 'info@d-mansei.co.jp',
-        }),
-      });
 
-      if (customerResponse.ok) {
-        console.log('お客様向け送信完了');
-        customerSuccess = true;
-      } else {
-        const errorText = await customerResponse.text();
-        console.error('お客様向け送信失敗:', {
-          status: customerResponse.status,
-          error: errorText
-        });
-      }
-    } catch (error) {
-      console.error('お客様向け送信エラー:', error);
-    }
-
-    // 2. 管理者向けメール送信
-    console.log('管理者向け送信中...', {
-      adminEmail: 'manseijaaa@gmail.com',
-      hasAccessKey: Boolean(accessKey)
-    });
-    
-    try {
-      const adminResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: accessKey,
-          name: '電化のマンセイ 管理者',
-          email: 'manseijaaa@gmail.com',
-          subject: '【管理者通知】エアコン取付工事 新規予約',
-          message: emailContent,
-          from_name: '電化のマンセイ',
-          replyto: 'info@d-mansei.co.jp',
-        }),
-      });
-
-      if (adminResponse.ok) {
-        console.log('管理者向け送信完了');
-        adminSuccess = true;
-      } else {
-        const errorText = await adminResponse.text();
-        console.error('管理者向け送信失敗:', {
-          status: adminResponse.status,
-          error: errorText
-        });
-      }
-    } catch (error) {
-      console.error('管理者向け送信エラー:', error);
-    }
-
-    // 結果の返却
-    const overallSuccess = customerSuccess || adminSuccess; // 少なくとも1つ成功すればOK
-    console.log('両方向送信結果:', {
-      customer: customerSuccess ? '成功' : '失敗',
-      admin: adminSuccess ? '成功' : '失敗',
-      overall: overallSuccess ? '成功' : '失敗'
-    });
-    
-    return overallSuccess;
-    
-  } catch (error) {
-    console.error('Web3Forms送信エラー:', error);
-    return false;
-  }
-}
 
 // メールテンプレート生成
 function generateEmailTemplate(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): string {
-  const customer = jicooData.data.attendees[0];
-  const reservationDate = new Date(jicooData.data.start_time);
+  const bookingInfo = extractBookingInfo(jicooData);
+  const reservationDate = new Date(bookingInfo.startTime);
   
   let estimateDetails = '';
   if (estimateData) {
@@ -274,7 +252,7 @@ ${generateEstimateDetails(estimateData)}
 　エアコン取付工事　予約完了のお知らせ
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${customer?.name || 'お客様'}
+${bookingInfo.customer.name || 'お客様'}
 
 この度は電化のマンセイにご予約をいただき、
 誠にありがとうございます。
@@ -283,7 +261,7 @@ ${estimateDetails}
 
 ■ 予約情報
 ─────────────────────────────────
-予約ID：${jicooData.data.id}
+予約ID：${bookingInfo.id}
 工事予定日：${reservationDate.toLocaleDateString('ja-JP')}
 工事時間：${reservationDate.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
 予約完了日：${new Date().toLocaleString('ja-JP')}
@@ -393,7 +371,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       // 今回はテスト用の見積りデータを生成
       estimateData = {
         estimateId: estimateId,
-        customerEmail: bookingData.attendee?.email,
+        customerEmail: bookingData.contact?.email || bookingData.attendee?.email,
         answers: [
           {
             questionId: "location",
@@ -424,7 +402,14 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     }
 
     // お客様情報のバリデーション（公式仕様対応）
-    if (!bookingData.attendee || !bookingData.attendee.email) {
+    let customer;
+    if (bookingData.contact) {
+      // 公式仕様の場合
+      customer = bookingData.contact;
+    } else if (bookingData.attendee) {
+      // 旧形式の場合
+      customer = bookingData.attendee;
+    } else {
       console.error('お客様情報がありません');
       return res.status(400).json({ 
         success: false, 
@@ -432,7 +417,13 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       });
     }
 
-    const customer = bookingData.attendee;
+    if (!customer || !customer.email) {
+      console.error('お客様のメールアドレスがありません');
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No customer email found' 
+      });
+    }
     console.log('お客様情報:', {
       name: customer.name,
       email: customer.email,
@@ -440,78 +431,31 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       reservationDate: bookingData.start_at
     });
 
-    // 確認メール送信（EmailJSまたはWeb3Formsを使用）
+    // 確認メール送信（EmailJS一本化）
     let emailSuccess = false;
     
-    const hasWeb3Forms = Boolean(process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key");
     const hasEmailJS = isEmailJSConfigured();
     
-    console.log('メール送信設定確認:', {
+    console.log('EmailJS設定確認:', {
       emailJSConfigured: hasEmailJS,
-      web3FormsConfigured: hasWeb3Forms,
       emailJSServiceId: emailJSConfig.serviceId === "your_service_id" ? '未設定' : '設定済み',
-      web3FormsKey: process.env.WEB3FORMS_ACCESS_KEY ? '設定済み' : '未設定',
-      selectedService: hasWeb3Forms ? 'Web3Forms' : hasEmailJS ? 'EmailJS' : 'なし'
+      emailJSTemplateId: emailJSConfig.templateId === "your_template_id" ? '未設定' : '設定済み',
+      emailJSPublicKey: emailJSConfig.publicKey === "your_public_key" ? '未設定' : '設定済み'
     });
     
-    // Web3Formsを使用（サーバーサイド対応のため優先）
-    if (hasWeb3Forms) {
-      console.log('Web3Formsで両方向メール送信を実行します...');
-      // 公式仕様に合わせてbookingDataを渡す
-      const adaptedJicooData = {
-        event: eventType,
-        data: {
-          id: bookingData.id,
-          start_time: bookingData.start_at,
-          end_time: bookingData.end_at,
-          timezone: bookingData.timezone,
-          attendees: [bookingData.attendee],
-          host: bookingData.host,
-          created_at: bookingData.created_at,
-          updated_at: bookingData.updated_at
-        }
-      };
-      emailSuccess = await sendConfirmationEmailWeb3Forms(adaptedJicooData as any, estimateData);
-      
-      if (!emailSuccess) {
-        console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
-        if (hasEmailJS) {
-          emailSuccess = await sendConfirmationEmail(adaptedJicooData as any, estimateData);
-        }
-      }
-    } 
-    // Web3Formsが設定されていない場合のみEmailJSを試行
-    else if (hasEmailJS) {
-      console.log('EmailJSでメール送信中...');
-      const adaptedJicooData = {
-        event: eventType,
-        data: {
-          id: bookingData.id,
-          start_time: bookingData.start_at,
-          end_time: bookingData.end_at,
-          timezone: bookingData.timezone,
-          attendees: [bookingData.attendee],
-          host: bookingData.host,
-          created_at: bookingData.created_at,
-          updated_at: bookingData.updated_at
-        }
-      };
-      emailSuccess = await sendConfirmationEmail(adaptedJicooData as any, estimateData);
-    } 
-    // どちらも設定されていない場合
-    else {
-      console.warn('メール送信設定がありません。Web3FormsまたはEmailJSのAPIキーが必要です。');
-    }
+    // EmailJS送信はフロントエンドで行うため、サーバーサイドでは予約データの保存のみ
+    console.log('📝 予約データを保存しました。EmailJS送信はフロントエンドで実行されます。');
+    emailSuccess = true; // フロントエンドでの送信を前提とする
 
     // レスポンス返却（公式仕様対応）
     res.status(200).json({
       success: true,
       message: 'Webhook processed successfully',
       data: {
-        reservationId: bookingData.id,
+        reservationId: bookingData.uid || bookingData.id,
         customerName: customer.name,
         customerEmail: customer.email,
-        reservationDate: bookingData.start_at,
+        reservationDate: bookingData.startedAt || bookingData.start_at,
         emailSent: emailSuccess,
         estimateId: estimateId || null,
         eventType: eventType
