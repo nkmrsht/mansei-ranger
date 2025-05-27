@@ -130,7 +130,7 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
 }
 
 // Web3Forms送信用の代替関数
-async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
+async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData, recipient: 'customer' | 'admin' = 'customer'): Promise<boolean> {
   try {
     const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
     
@@ -146,8 +146,17 @@ async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estim
     
     const emailContent = generateEmailTemplate(jicooData, estimateData);
     
-    console.log('Web3Forms送信中...', {
-      customerEmail: customer?.email,
+    // 送信先の決定
+    const isCustomerEmail = recipient === 'customer';
+    const recipientEmail = isCustomerEmail ? customer?.email : 'manseijaaa@gmail.com';
+    const recipientName = isCustomerEmail ? customer?.name || 'お客様' : '電化のマンセイ 管理者';
+    const emailSubject = isCustomerEmail 
+      ? 'エアコン取付工事 予約完了のお知らせ'
+      : '【管理者通知】エアコン取付工事 新規予約';
+    
+    console.log(`Web3Forms送信中 (${recipient})...`, {
+      recipientEmail,
+      recipientName,
       hasAccessKey: Boolean(accessKey)
     });
     
@@ -158,9 +167,9 @@ async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estim
       },
       body: JSON.stringify({
         access_key: accessKey,
-        name: customer?.name || 'お客様',
-        email: customer?.email || 'info@d-mansei.co.jp',
-        subject: 'エアコン取付工事 見積り・予約完了のお知らせ',
+        name: recipientName,
+        email: recipientEmail,
+        subject: emailSubject,
         message: emailContent,
         from_name: '電化のマンセイ',
         replyto: 'info@d-mansei.co.jp',
@@ -288,8 +297,45 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       });
     }
 
-    // 見積りデータの取得（今回はテスト用にスキップ）
+    // 見積りデータの取得（クエリパラメータまたはリクエストボディから）
     let estimateData: EstimateWebhookData | undefined;
+    const estimateId = req.query?.estimate_id as string || req.body?.estimate_id as string;
+    
+    if (estimateId) {
+      console.log('見積りID受信:', estimateId);
+      // 実際の実装では、ここで見積りデータを取得
+      // 今回はテスト用の見積りデータを生成
+      estimateData = {
+        estimateId: estimateId,
+        customerEmail: jicooData.data.attendees[0]?.email,
+        answers: [
+          {
+            questionId: "location",
+            selectedOption: 0,
+            optionLabel: "リビング・ダイニング",
+            price: 0
+          },
+          {
+            questionId: "piping",
+            selectedOption: 1,
+            optionLabel: "穴あけ工事が必要",
+            price: 5000
+          },
+          {
+            questionId: "electrical",
+            selectedOption: 1,
+            optionLabel: "専用回路なし（新設が必要）",
+            price: 8000
+          }
+        ],
+        totalPrice: 32000,
+        basePrice: 19000,
+        createdAt: new Date().toISOString()
+      };
+      console.log('見積りデータを生成しました:', estimateData);
+    } else {
+      console.log('見積りIDが提供されていません。基本料金のみで処理します。');
+    }
 
     // お客様情報のバリデーション
     if (!jicooData.data.attendees || jicooData.data.attendees.length === 0) {
@@ -324,7 +370,22 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     // Web3Formsを使用（サーバーサイド対応のため優先）
     if (hasWeb3Forms) {
       console.log('Web3Formsでメール送信を実行します...');
-      emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
+      
+      // 1. お客様向けメール送信
+      console.log('お客様向けメールを送信中...');
+      const customerEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'customer');
+      
+      // 2. 管理者向けメール送信
+      console.log('管理者向けメールを送信中...');
+      const adminEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'admin');
+      
+      emailSuccess = customerEmailSuccess && adminEmailSuccess;
+      
+      console.log('メール送信結果:', {
+        customer: customerEmailSuccess ? '成功' : '失敗',
+        admin: adminEmailSuccess ? '成功' : '失敗',
+        overall: emailSuccess ? '成功' : '失敗'
+      });
       
       if (!emailSuccess) {
         console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
@@ -353,7 +414,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
         customerEmail: customer.email,
         reservationDate: jicooData.data.start_time,
         emailSent: emailSuccess,
-        estimateId: 'test-estimate'
+        estimateId: estimateId || null
       }
     });
 
