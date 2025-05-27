@@ -18,28 +18,33 @@ function isEmailJSConfigured(): boolean {
          Boolean(emailJSConfig.publicKey);
 }
 
+// Jicoo公式仕様に基づくWebhookデータ型定義
 export interface JicooWebhookData {
-  event: string;
-  data: {
+  event_type: string; // 公式仕様では event_type
+  booking: {
     id: string;
-    title: string;
-    start_time: string;
-    end_time: string;
+    event_type_id: string;
+    start_at: string; // 公式仕様では start_at
+    end_at: string;   // 公式仕様では end_at
     timezone: string;
     location?: string;
     description?: string;
-    attendees: Array<{
+    attendee: {
       name: string;
       email: string;
-      status: string;
-    }>;
+      phone?: string;
+    };
     host: {
       name: string;
       email: string;
     };
     created_at: string;
     updated_at: string;
+    canceled_at?: string;
   };
+  // 旧形式との互換性のため
+  event?: string;
+  data?: any;
 }
 
 export interface EstimateWebhookData {
@@ -323,7 +328,7 @@ function generateEstimateDetails(estimateData: EstimateWebhookData): string {
   }
 }
 
-// Jicoo Webhookハンドラー
+// Jicoo公式仕様準拠 Webhookハンドラー
 export async function handleJicooWebhook(req: Request, res: Response) {
   try {
     const timestamp = new Date().toISOString();
@@ -333,15 +338,47 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     console.log('📝 リクエストボディ:', JSON.stringify(req.body, null, 2));
     console.log('🔔 Webhook受信詳細情報 END ===================');
     
-    const jicooData: JicooWebhookData = req.body;
+    // Jicoo公式仕様とテスト用の両方に対応
+    let jicooData: JicooWebhookData;
+    let eventType: string;
+    let bookingData: any;
     
-    // 予約完了イベントのみ処理
-    if (jicooData.event !== 'booking.created' && jicooData.event !== 'appointment.booked') {
-      console.log('処理対象外のイベント:', jicooData.event);
+    // 公式仕様の形式をチェック
+    if (req.body.event_type && req.body.booking) {
+      console.log('✅ Jicoo公式仕様形式を検出');
+      jicooData = req.body;
+      eventType = jicooData.event_type;
+      bookingData = jicooData.booking;
+    } 
+    // テスト用の旧形式にも対応
+    else if (req.body.event && req.body.data) {
+      console.log('✅ テスト用旧形式を検出');
+      eventType = req.body.event;
+      bookingData = {
+        id: req.body.data.id,
+        start_at: req.body.data.start_time,
+        end_at: req.body.data.end_time,
+        timezone: req.body.data.timezone,
+        attendee: req.body.data.attendees?.[0] || {},
+        host: req.body.data.host || {},
+        created_at: req.body.data.created_at,
+        updated_at: req.body.data.updated_at
+      };
+    } else {
+      console.error('❌ 不明なWebhook形式:', req.body);
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid webhook format' 
+      });
+    }
+    
+    // 対応するイベントタイプをチェック
+    if (eventType !== 'booking.created' && eventType !== 'booking_created' && eventType !== 'appointment.booked') {
+      console.log('処理対象外のイベント:', eventType);
       return res.status(200).json({ 
         success: true, 
         message: 'Event received but not processed',
-        event: jicooData.event 
+        event_type: eventType 
       });
     }
 
@@ -355,7 +392,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       // 今回はテスト用の見積りデータを生成
       estimateData = {
         estimateId: estimateId,
-        customerEmail: jicooData.data.attendees[0]?.email,
+        customerEmail: bookingData.attendee?.email,
         answers: [
           {
             questionId: "location",
@@ -385,8 +422,8 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       console.log('見積りIDが提供されていません。基本料金のみで処理します。');
     }
 
-    // お客様情報のバリデーション
-    if (!jicooData.data.attendees || jicooData.data.attendees.length === 0) {
+    // お客様情報のバリデーション（公式仕様対応）
+    if (!bookingData.attendee || !bookingData.attendee.email) {
       console.error('お客様情報がありません');
       return res.status(400).json({ 
         success: false, 
@@ -394,11 +431,12 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       });
     }
 
-    const customer = jicooData.data.attendees[0];
+    const customer = bookingData.attendee;
     console.log('お客様情報:', {
       name: customer.name,
       email: customer.email,
-      reservationDate: jicooData.data.start_time
+      phone: customer.phone,
+      reservationDate: bookingData.start_at
     });
 
     // 確認メール送信（EmailJSまたはWeb3Formsを使用）
@@ -418,19 +456,46 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     // Web3Formsを使用（サーバーサイド対応のため優先）
     if (hasWeb3Forms) {
       console.log('Web3Formsで両方向メール送信を実行します...');
-      emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
+      // 公式仕様に合わせてbookingDataを渡す
+      const adaptedJicooData = {
+        event: eventType,
+        data: {
+          id: bookingData.id,
+          start_time: bookingData.start_at,
+          end_time: bookingData.end_at,
+          timezone: bookingData.timezone,
+          attendees: [bookingData.attendee],
+          host: bookingData.host,
+          created_at: bookingData.created_at,
+          updated_at: bookingData.updated_at
+        }
+      };
+      emailSuccess = await sendConfirmationEmailWeb3Forms(adaptedJicooData, estimateData);
       
       if (!emailSuccess) {
         console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
         if (hasEmailJS) {
-          emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
+          emailSuccess = await sendConfirmationEmail(adaptedJicooData, estimateData);
         }
       }
     } 
     // Web3Formsが設定されていない場合のみEmailJSを試行
     else if (hasEmailJS) {
       console.log('EmailJSでメール送信中...');
-      emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
+      const adaptedJicooData = {
+        event: eventType,
+        data: {
+          id: bookingData.id,
+          start_time: bookingData.start_at,
+          end_time: bookingData.end_at,
+          timezone: bookingData.timezone,
+          attendees: [bookingData.attendee],
+          host: bookingData.host,
+          created_at: bookingData.created_at,
+          updated_at: bookingData.updated_at
+        }
+      };
+      emailSuccess = await sendConfirmationEmail(adaptedJicooData, estimateData);
     } 
     // どちらも設定されていない場合
     else {
