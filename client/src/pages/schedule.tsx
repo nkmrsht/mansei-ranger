@@ -11,11 +11,25 @@ export default function Schedule() {
   const { toast } = useToast();
   const [emailStatus, setEmailStatus] = useState<'pending' | 'sending' | 'sent' | 'failed'>('pending');
   const [estimateData, setEstimateData] = useState<any>(null);
+  const [jicooUrl, setJicooUrl] = useState<string>('');
 
   useEffect(() => {
     // 見積りデータを取得
     const data = getCurrentEstimateData();
     setEstimateData(data);
+
+    // 見積りIDを含むJicoo URLを生成
+    const baseJicooUrl = 'https://www.jicoo.com/event_types/o-P4XTBDZeLW/widget';
+    const estimateId = data?.id;
+    const webhookUrl = 'https://mansei-ranger.replit.dev/api/webhook/jicoo';
+    
+    let dynamicUrl = baseJicooUrl;
+    if (estimateId) {
+      // 見積りIDとWebhook URLをクエリパラメータとして追加
+      dynamicUrl = `${baseJicooUrl}?estimate_id=${estimateId}&webhook_url=${encodeURIComponent(webhookUrl)}`;
+      console.log('動的Jicoo URL生成:', dynamicUrl);
+    }
+    setJicooUrl(dynamicUrl);
 
     // Jicooウィジェットのスクリプトを動的に読み込み
     const script = document.createElement('script');
@@ -164,11 +178,20 @@ export default function Schedule() {
             
             {/* Jicoo Widget */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div 
-                className="jicoo-widget" 
-                data-url="https://www.jicoo.com/event_types/o-P4XTBDZeLW/widget" 
-                style={{minWidth: '320px', height: '720px', border: '1px solid #e4e4e4', boxSizing: 'content-box'}}
-              ></div>
+              {jicooUrl ? (
+                <div 
+                  className="jicoo-widget" 
+                  data-url={jicooUrl}
+                  style={{minWidth: '320px', height: '720px', border: '1px solid #e4e4e4', boxSizing: 'content-box'}}
+                ></div>
+              ) : (
+                <div className="flex items-center justify-center h-96">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">予約システムを読み込み中...</p>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
