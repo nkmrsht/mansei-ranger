@@ -288,8 +288,8 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       });
     }
 
-    // 見積りデータの取得（クエリパラメータまたはヘッダーから）
-    const estimateId = req.query.estimate_id as string || req.headers['x-estimate-id'] as string;
+    // 見積りデータの取得（クエリパラメータから）
+    const estimateId = req.query ? req.query.estimate_id as string : undefined;
     let estimateData: EstimateWebhookData | undefined;
 
     if (estimateId) {
