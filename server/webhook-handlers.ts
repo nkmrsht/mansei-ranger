@@ -374,7 +374,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     
     // 対応するイベントタイプをチェック
     console.log('受信イベントタイプ:', eventType);
-    if (eventType !== 'booking.created' && eventType !== 'booking_created' && eventType !== 'appointment.booked') {
+    if (eventType !== 'booking.created' && eventType !== 'booking_created' && eventType !== 'appointment.booked' && eventType !== 'booking.created') {
       console.log('処理対象外のイベント:', eventType);
       return res.status(200).json({ 
         success: true, 
