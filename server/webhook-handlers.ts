@@ -317,19 +317,19 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       web3FormsKey: process.env.WEB3FORMS_ACCESS_KEY ? '設定済み' : '未設定'
     });
     
-    // EmailJSを優先して使用
-    if (isEmailJSConfigured()) {
-      console.log('EmailJSでメール送信中...');
-      emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
-    } 
-    // EmailJSが設定されていない場合はWeb3Formsを試行
-    else if (process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key") {
+    // Web3Formsを優先して使用（サーバーサイド対応のため）
+    if (process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key") {
       console.log('Web3Formsでメール送信中...');
       emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
     } 
+    // Web3Formsが設定されていない場合はEmailJSを試行（ブラウザからの場合のみ動作）
+    else if (isEmailJSConfigured()) {
+      console.log('EmailJSでメール送信中...');
+      emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
+    } 
     // どちらも設定されていない場合
     else {
-      console.warn('メール送信設定がありません。EmailJSまたはWeb3FormsのAPIキーが必要です。');
+      console.warn('メール送信設定がありません。Web3FormsまたはEmailJSのAPIキーが必要です。');
     }
 
     // レスポンス返却
