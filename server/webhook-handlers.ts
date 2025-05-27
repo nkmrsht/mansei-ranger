@@ -371,21 +371,29 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     if (hasWeb3Forms) {
       console.log('Web3Formsでメール送信を実行します...');
       
-      // 1. お客様向けメール送信
-      console.log('お客様向けメールを送信中...');
-      const customerEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'customer');
-      
-      // 2. 管理者向けメール送信
-      console.log('管理者向けメールを送信中...');
-      const adminEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'admin');
-      
-      emailSuccess = customerEmailSuccess && adminEmailSuccess;
-      
-      console.log('メール送信結果:', {
-        customer: customerEmailSuccess ? '成功' : '失敗',
-        admin: adminEmailSuccess ? '成功' : '失敗',
-        overall: emailSuccess ? '成功' : '失敗'
-      });
+      try {
+        // 1. お客様向けメール送信
+        console.log('=== お客様向けメール送信開始 ===');
+        const customerEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'customer');
+        console.log('お客様向けメール送信結果:', customerEmailSuccess);
+        
+        // 2. 管理者向けメール送信
+        console.log('=== 管理者向けメール送信開始 ===');
+        const adminEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'admin');
+        console.log('管理者向けメール送信結果:', adminEmailSuccess);
+        
+        emailSuccess = customerEmailSuccess && adminEmailSuccess;
+        
+        console.log('=== 最終メール送信結果 ===', {
+          customer: customerEmailSuccess ? '成功' : '失敗',
+          admin: adminEmailSuccess ? '成功' : '失敗',
+          overall: emailSuccess ? '成功' : '失敗'
+        });
+        
+      } catch (error) {
+        console.error('メール送信処理中にエラー:', error);
+        emailSuccess = false;
+      }
       
       if (!emailSuccess) {
         console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
