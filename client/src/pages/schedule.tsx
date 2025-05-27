@@ -45,10 +45,11 @@ export default function Schedule() {
 
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        console.log('🔔 Jicooからのメッセージ受信:', data);
         
         // 予約完了イベントを検知
-        if (data.type === 'booking_completed' || data.event === 'booking_success') {
-          console.log('Jicoo予約完了を検知:', data);
+        if (data.type === 'booking_completed' || data.event === 'booking_success' || data.type === 'booking_created') {
+          console.log('✅ Jicoo予約完了を検知:', data);
           
           // 予約データを更新
           const reservationData = {

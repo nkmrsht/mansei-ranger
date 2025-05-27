@@ -9,13 +9,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ヘルスチェック用エンドポイント
   app.get('/api/webhook/status', (req, res) => {
+    console.log('🔍 Webhook状態確認アクセス:', new Date().toISOString());
     res.json({
       status: 'active',
       timestamp: new Date().toISOString(),
       webhooks: {
         jicoo: '/api/webhook/jicoo'
+      },
+      server: {
+        url: 'https://mansei-ranger.replit.dev/api/webhook/jicoo',
+        listening: true
       }
     });
+  });
+
+  // 全HTTPリクエスト監視（Webhook以外も含む）
+  app.use('/api/webhook/*', (req, res, next) => {
+    const timestamp = new Date().toISOString();
+    console.log(`🌐 [${timestamp}] 任意のWebhookアクセス検知:`, {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+      body: req.body
+    });
+    next();
   });
 
   // Jicoo Webhookテスト用エンドポイント（実際のJicooデータ形式でテスト）

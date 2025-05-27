@@ -326,7 +326,12 @@ function generateEstimateDetails(estimateData: EstimateWebhookData): string {
 // Jicoo Webhookハンドラー
 export async function handleJicooWebhook(req: Request, res: Response) {
   try {
-    console.log('Jicoo Webhook受信:', JSON.stringify(req.body, null, 2));
+    const timestamp = new Date().toISOString();
+    console.log(`🔔 [${timestamp}] Jicoo Webhook受信 START =================`);
+    console.log('📝 リクエストヘッダー:', JSON.stringify(req.headers, null, 2));
+    console.log('📝 クエリパラメータ:', JSON.stringify(req.query, null, 2));
+    console.log('📝 リクエストボディ:', JSON.stringify(req.body, null, 2));
+    console.log('🔔 Webhook受信詳細情報 END ===================');
     
     const jicooData: JicooWebhookData = req.body;
     
