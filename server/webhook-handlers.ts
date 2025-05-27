@@ -310,20 +310,31 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     // 確認メール送信（EmailJSまたはWeb3Formsを使用）
     let emailSuccess = false;
     
+    const hasWeb3Forms = Boolean(process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key");
+    const hasEmailJS = isEmailJSConfigured();
+    
     console.log('メール送信設定確認:', {
-      emailJSConfigured: isEmailJSConfigured(),
-      web3FormsConfigured: Boolean(process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key"),
+      emailJSConfigured: hasEmailJS,
+      web3FormsConfigured: hasWeb3Forms,
       emailJSServiceId: emailJSConfig.serviceId === "your_service_id" ? '未設定' : '設定済み',
-      web3FormsKey: process.env.WEB3FORMS_ACCESS_KEY ? '設定済み' : '未設定'
+      web3FormsKey: process.env.WEB3FORMS_ACCESS_KEY ? '設定済み' : '未設定',
+      selectedService: hasWeb3Forms ? 'Web3Forms' : hasEmailJS ? 'EmailJS' : 'なし'
     });
     
-    // Web3Formsを優先して使用（サーバーサイド対応のため）
-    if (process.env.WEB3FORMS_ACCESS_KEY && process.env.WEB3FORMS_ACCESS_KEY !== "your_access_key") {
-      console.log('Web3Formsでメール送信中...');
+    // Web3Formsを使用（サーバーサイド対応のため優先）
+    if (hasWeb3Forms) {
+      console.log('Web3Formsでメール送信を実行します...');
       emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
+      
+      if (!emailSuccess) {
+        console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
+        if (hasEmailJS) {
+          emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
+        }
+      }
     } 
-    // Web3Formsが設定されていない場合はEmailJSを試行（ブラウザからの場合のみ動作）
-    else if (isEmailJSConfigured()) {
+    // Web3Formsが設定されていない場合のみEmailJSを試行
+    else if (hasEmailJS) {
       console.log('EmailJSでメール送信中...');
       emailSuccess = await sendConfirmationEmail(jicooData, estimateData);
     } 
