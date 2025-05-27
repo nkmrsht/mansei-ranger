@@ -14,67 +14,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Webhookハンドラーを呼び出し
       await handleJicooWebhook(req, res);
-      
-      // 予約データを一時保存（見積りIDをキーとして）
-      const estimateId = req.query?.estimate_id as string || req.body?.estimate_id as string;
-      if (estimateId && req.body) {
-        let bookingData;
-        
-        // Jicoo公式仕様の形式をチェック
-        if (req.body.event_type && req.body.booking) {
-          // bookingDataをフロントエンドが期待する形式に変換
-          const b = req.body.booking;
-          bookingData = {
-            id: b.uid || b.id,
-            start_at: b.startedAt || b.start_at,
-            end_at: b.endedAt || b.end_at,
-            timezone: b.timeZone || b.timezone,
-            attendee: b.contact || {},
-            host: b.host || {},
-            created_at: b.createdAt || b.created_at,
-            updated_at: b.updatedAt || b.updated_at
-          };
-        } 
-        // 新しい形式（guest_booked + object）に対応
-        else if (req.body.event === 'guest_booked' && req.body.object) {
-          const obj = req.body.object;
-          bookingData = {
-            id: obj.uid,
-            start_at: obj.startedAt,
-            end_at: obj.endedAt,
-            timezone: obj.timeZone,
-            attendee: obj.contact,
-            host: {
-              name: '電化のマンセイ',
-              email: 'info@d-mansei.co.jp'
-            },
-            created_at: obj.createdAt,
-            updated_at: obj.updatedAt
-          };
+
+      // 予約データを一時保存
+      let bookingData;
+      let uniqueKey = "";
+
+      // Jicoo公式仕様の形式
+      if (req.body.event_type && req.body.booking) {
+        const b = req.body.booking;
+        bookingData = {
+          id: b.uid || b.id,
+          start_at: b.startedAt || b.start_at,
+          end_at: b.endedAt || b.end_at,
+          timezone: b.timeZone || b.timezone,
+          attendee: b.contact || {},
+          host: b.host || {},
+          created_at: b.createdAt || b.created_at,
+          updated_at: b.updatedAt || b.updated_at
+        };
+        uniqueKey = b.uid || b.id || (b.startedAt || b.start_at) || Date.now().toString();
+      }
+      // 新しい形式（guest_booked + object）
+      else if (req.body.event === 'guest_booked' && req.body.object) {
+        const obj = req.body.object;
+        bookingData = {
+          id: obj.uid,
+          start_at: obj.startedAt,
+          end_at: obj.endedAt,
+          timezone: obj.timeZone,
+          attendee: obj.contact,
+          host: {
+            name: '電化のマンセイ',
+            email: 'info@d-mansei.co.jp'
+          },
+          created_at: obj.createdAt,
+          updated_at: obj.updatedAt
+        };
+        uniqueKey = obj.uid || obj.startedAt || Date.now().toString();
+      }
+      // テスト用の旧形式
+      else if (req.body.event && req.body.data) {
+        bookingData = {
+          id: req.body.data.id,
+          start_at: req.body.data.start_time,
+          end_at: req.body.data.end_time,
+          timezone: req.body.data.timezone,
+          attendee: req.body.data.attendees?.[0] || {},
+          host: req.body.data.host || {},
+          created_at: req.body.data.created_at,
+          updated_at: req.body.data.updated_at
+        };
+        uniqueKey = req.body.data.id || req.body.data.start_time || Date.now().toString();
+      }
+      else {
+        console.error('❌ 不明なWebhook形式:', req.body);
+        if (!res.headersSent) {
+          return res.status(400).json({ 
+            success: false, 
+            error: 'Invalid webhook format' 
+          });
         }
-        // テスト用の旧形式にも対応
-        else if (req.body.event && req.body.data) {
-          bookingData = {
-            id: req.body.data.id,
-            start_at: req.body.data.start_time,
-            end_at: req.body.data.end_time,
-            timezone: req.body.data.timezone,
-            attendee: req.body.data.attendees?.[0] || {},
-            host: req.body.data.host || {},
-            created_at: req.body.data.created_at,
-            updated_at: req.body.data.updated_at
-          };
+        return;
+      }
+
+      // 見積りIDの取得と検証
+      const estimateId = req.query?.estimate_id as string || 
+                        req.body?.estimate_id as string || 
+                        req.body?.booking?.estimate_id as string || 
+                        uniqueKey;
+
+      if (!estimateId) {
+        console.error('❌ 見積りIDが見つかりません');
+        if (!res.headersSent) {
+          return res.status(400).json({
+            success: false,
+            error: 'No estimate ID provided'
+          });
         }
-        
-        if (bookingData) {
+        return;
+      }
+
+      // 予約データの保存
+      if (bookingData) {
+        try {
           bookingDataStore.set(estimateId, {
             bookingData,
             timestamp: new Date().toISOString()
           });
           console.log(`📝 予約データを保存: ${estimateId}`, bookingData);
+        } catch (error) {
+          console.error('予約データ保存エラー:', error);
+          if (!res.headersSent) {
+            return res.status(500).json({
+              success: false,
+              error: 'Failed to save booking data',
+              message: error instanceof Error ? error.message : 'Unknown error'
+            });
+          }
+          return;
         }
       }
-      
+
     } catch (error) {
       console.error('Webhook処理エラー:', error);
       if (!res.headersSent) {

@@ -58,7 +58,7 @@ app.use((req, res, next) => {
   }
 
   // Mac対応：localhostでリッスン
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 3002;
   server.listen(Number(port), 'localhost', () => {
     log(`serving on http://localhost:${port}`);
   });

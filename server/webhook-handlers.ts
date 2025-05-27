@@ -33,6 +33,7 @@ export interface JicooWebhookData {
     contact: {
       name: string;
       email: string;
+      phone?: string;  // 電話番号フィールドを追加
     };
     answers?: Array<{
       question: string;
@@ -64,6 +65,7 @@ export interface JicooWebhookData {
       name: string;
       email: string;
       status?: string;
+      phone?: string;  // 電話番号フィールドを追加
     }>;
     host: {
       name: string;
@@ -105,6 +107,7 @@ function extractBookingInfo(webhookData: JicooWebhookData) {
       customer: {
         name: webhookData.booking.contact.name,
         email: webhookData.booking.contact.email,
+        phone: webhookData.booking.contact.phone
       },
       answers: webhookData.booking.answers || [],
       tracking: webhookData.booking.tracking,
@@ -130,6 +133,7 @@ function extractBookingInfo(webhookData: JicooWebhookData) {
       customer: {
         name: customer?.name || 'お客様',
         email: customer?.email || '',
+        phone: customer?.phone
       },
       answers: [],
       tracking: undefined,
@@ -160,13 +164,14 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
     const bookingInfo = extractBookingInfo(jicooData);
     const reservationDate = new Date(bookingInfo.startTime);
     
-    const emailData = {
+    // 顧客向けメール送信
+    const customerEmailData = {
       service_id: emailJSConfig.serviceId,
       template_id: emailJSConfig.templateId,
       user_id: emailJSConfig.publicKey,
       template_params: {
-        to_email: bookingInfo.customer.email || 'info@d-mansei.co.jp',
-        customer_name: bookingInfo.customer.name || 'お客様',
+        to_email: bookingInfo.customer.email,
+        customer_name: bookingInfo.customer.name,
         reservation_id: bookingInfo.id,
         reservation_date: reservationDate.toLocaleDateString('ja-JP'),
         reservation_time: reservationDate.toLocaleTimeString('ja-JP', { 
@@ -185,30 +190,62 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
       }
     };
 
+    // ホスト向けメール送信
+    const hostEmailData = {
+      ...customerEmailData,
+      template_params: {
+        ...customerEmailData.template_params,
+        to_email: 'info@d-mansei.co.jp',
+        customer_name: '電化のマンセイ スタッフ',
+        additional_info: `
+■ 予約者情報
+名前：${bookingInfo.customer.name}
+メール：${bookingInfo.customer.email}
+電話：${bookingInfo.customer.phone || '未設定'}
+
+■ 工事内容
+${estimateData ? generateEstimateDetails(estimateData) : '見積もりデータなし'}
+        `
+      }
+    };
+
     console.log('EmailJS送信中...', {
       serviceId: emailJSConfig.serviceId,
       templateId: emailJSConfig.templateId,
       customerEmail: bookingInfo.customer.email,
+      hostEmail: 'info@d-mansei.co.jp',
       eventType: bookingInfo.eventType
     });
 
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    // 顧客向けメール送信
+    const customerResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(emailData)
+      body: JSON.stringify(customerEmailData)
     });
 
-    if (response.ok) {
-      console.log('EmailJS送信成功');
+    // ホスト向けメール送信
+    const hostResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(hostEmailData)
+    });
+
+    if (customerResponse.ok && hostResponse.ok) {
+      console.log('EmailJS送信成功（顧客・ホスト両方）');
       return true;
     } else {
-      const errorText = await response.text();
+      const customerError = await customerResponse.text();
+      const hostError = await hostResponse.text();
       console.error('EmailJS送信失敗:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
+        customerStatus: customerResponse.status,
+        customerError: customerError,
+        hostStatus: hostResponse.status,
+        hostError: hostError
       });
       return false;
     }
@@ -217,8 +254,6 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
     return false;
   }
 }
-
-
 
 // メールテンプレート生成
 function generateEmailTemplate(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): string {
@@ -431,21 +466,12 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       reservationDate: bookingData.start_at
     });
 
-    // 確認メール送信（EmailJS一本化）
-    let emailSuccess = false;
+    // 確認メール送信
+    const emailSuccess = await sendConfirmationEmail(req.body, estimateData);
     
-    const hasEmailJS = isEmailJSConfigured();
-    
-    console.log('EmailJS設定確認:', {
-      emailJSConfigured: hasEmailJS,
-      emailJSServiceId: emailJSConfig.serviceId === "your_service_id" ? '未設定' : '設定済み',
-      emailJSTemplateId: emailJSConfig.templateId === "your_template_id" ? '未設定' : '設定済み',
-      emailJSPublicKey: emailJSConfig.publicKey === "your_public_key" ? '未設定' : '設定済み'
-    });
-    
-    // EmailJS送信はフロントエンドで行うため、サーバーサイドでは予約データの保存のみ
-    console.log('📝 予約データを保存しました。EmailJS送信はフロントエンドで実行されます。');
-    emailSuccess = true; // フロントエンドでの送信を前提とする
+    if (!emailSuccess) {
+      console.warn('⚠️ メール送信に失敗しましたが、処理は続行します');
+    }
 
     // レスポンス返却（公式仕様対応）
     res.status(200).json({
@@ -464,10 +490,12 @@ export async function handleJicooWebhook(req: Request, res: Response) {
 
   } catch (error) {
     console.error('Webhook処理エラー:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   }
 }
