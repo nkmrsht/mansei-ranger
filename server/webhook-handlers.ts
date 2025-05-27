@@ -129,8 +129,8 @@ async function sendConfirmationEmail(jicooData: JicooWebhookData, estimateData?:
   }
 }
 
-// Web3Forms送信用の代替関数
-async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData, recipient: 'customer' | 'admin' = 'customer'): Promise<boolean> {
+// Web3Forms両方向送信用関数（緊急修正版）
+async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estimateData?: EstimateWebhookData): Promise<boolean> {
   try {
     const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
     
@@ -142,52 +142,95 @@ async function sendConfirmationEmailWeb3Forms(jicooData: JicooWebhookData, estim
     }
     
     const customer = jicooData.data.attendees[0];
-    const reservationDate = new Date(jicooData.data.start_time);
-    
     const emailContent = generateEmailTemplate(jicooData, estimateData);
     
-    // 送信先の決定
-    const isCustomerEmail = recipient === 'customer';
-    const recipientEmail = isCustomerEmail ? customer?.email : 'manseijaaa@gmail.com';
-    const recipientName = isCustomerEmail ? customer?.name || 'お客様' : '電化のマンセイ 管理者';
-    const emailSubject = isCustomerEmail 
-      ? 'エアコン取付工事 予約完了のお知らせ'
-      : '【管理者通知】エアコン取付工事 新規予約';
+    let customerSuccess = false;
+    let adminSuccess = false;
     
-    console.log(`Web3Forms送信中 (${recipient})...`, {
-      recipientEmail,
-      recipientName,
+    // 1. お客様向けメール送信
+    console.log('お客様向け送信中...', {
+      customerEmail: customer?.email,
       hasAccessKey: Boolean(accessKey)
     });
     
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        access_key: accessKey,
-        name: recipientName,
-        email: recipientEmail,
-        subject: emailSubject,
-        message: emailContent,
-        from_name: '電化のマンセイ',
-        replyto: 'info@d-mansei.co.jp',
-      }),
-    });
-
-    if (response.ok) {
-      console.log('Web3Forms送信成功');
-      return true;
-    } else {
-      const errorText = await response.text();
-      console.error('Web3Forms送信失敗:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
+    try {
+      const customerResponse = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: customer?.name || 'お客様',
+          email: customer?.email,
+          subject: 'エアコン取付工事 予約完了のお知らせ',
+          message: emailContent,
+          from_name: '電化のマンセイ',
+          replyto: 'info@d-mansei.co.jp',
+        }),
       });
-      return false;
+
+      if (customerResponse.ok) {
+        console.log('お客様向け送信完了');
+        customerSuccess = true;
+      } else {
+        const errorText = await customerResponse.text();
+        console.error('お客様向け送信失敗:', {
+          status: customerResponse.status,
+          error: errorText
+        });
+      }
+    } catch (error) {
+      console.error('お客様向け送信エラー:', error);
     }
+
+    // 2. 管理者向けメール送信
+    console.log('管理者向け送信中...', {
+      adminEmail: 'manseijaaa@gmail.com',
+      hasAccessKey: Boolean(accessKey)
+    });
+    
+    try {
+      const adminResponse = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: '電化のマンセイ 管理者',
+          email: 'manseijaaa@gmail.com',
+          subject: '【管理者通知】エアコン取付工事 新規予約',
+          message: emailContent,
+          from_name: '電化のマンセイ',
+          replyto: 'info@d-mansei.co.jp',
+        }),
+      });
+
+      if (adminResponse.ok) {
+        console.log('管理者向け送信完了');
+        adminSuccess = true;
+      } else {
+        const errorText = await adminResponse.text();
+        console.error('管理者向け送信失敗:', {
+          status: adminResponse.status,
+          error: errorText
+        });
+      }
+    } catch (error) {
+      console.error('管理者向け送信エラー:', error);
+    }
+
+    // 結果の返却
+    const overallSuccess = customerSuccess || adminSuccess; // 少なくとも1つ成功すればOK
+    console.log('両方向送信結果:', {
+      customer: customerSuccess ? '成功' : '失敗',
+      admin: adminSuccess ? '成功' : '失敗',
+      overall: overallSuccess ? '成功' : '失敗'
+    });
+    
+    return overallSuccess;
+    
   } catch (error) {
     console.error('Web3Forms送信エラー:', error);
     return false;
@@ -369,31 +412,8 @@ export async function handleJicooWebhook(req: Request, res: Response) {
     
     // Web3Formsを使用（サーバーサイド対応のため優先）
     if (hasWeb3Forms) {
-      console.log('Web3Formsでメール送信を実行します...');
-      
-      try {
-        // 1. お客様向けメール送信
-        console.log('=== お客様向けメール送信開始 ===');
-        const customerEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'customer');
-        console.log('お客様向けメール送信結果:', customerEmailSuccess);
-        
-        // 2. 管理者向けメール送信
-        console.log('=== 管理者向けメール送信開始 ===');
-        const adminEmailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData, 'admin');
-        console.log('管理者向けメール送信結果:', adminEmailSuccess);
-        
-        emailSuccess = customerEmailSuccess && adminEmailSuccess;
-        
-        console.log('=== 最終メール送信結果 ===', {
-          customer: customerEmailSuccess ? '成功' : '失敗',
-          admin: adminEmailSuccess ? '成功' : '失敗',
-          overall: emailSuccess ? '成功' : '失敗'
-        });
-        
-      } catch (error) {
-        console.error('メール送信処理中にエラー:', error);
-        emailSuccess = false;
-      }
+      console.log('Web3Formsで両方向メール送信を実行します...');
+      emailSuccess = await sendConfirmationEmailWeb3Forms(jicooData, estimateData);
       
       if (!emailSuccess) {
         console.log('Web3Forms送信失敗のため、EmailJSを試行します...');
