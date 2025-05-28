@@ -443,7 +443,7 @@ export async function handleJicooWebhook(req: Request, res: Response) {
       customer = bookingData.contact;
     } else if (bookingData.attendee) {
       // 旧形式の場合
-ｒ      customer = bookingData.attendee;
+      customer = bookingData.attendee;
     } else {
       console.error('お客様情報がありません');
       return res.status(400).json({ 
