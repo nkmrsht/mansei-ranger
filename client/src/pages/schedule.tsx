@@ -33,7 +33,7 @@ export default function Schedule() {
     setEstimateData(data);
 
     // Jicoo URLを生成（見積りIDをWebhookで使用）
-    const baseJicooUrl = 'https://www.jicoo.com/event_types/o-P4XTBDZeLW/widget';
+    const baseJicooUrl = 'https://www.jicoo.com/event_types/yn0qt-RB_SPb/widget';
     const estimateId = data?.id;
     
     let dynamicUrl = baseJicooUrl;
@@ -409,204 +409,6 @@ export default function Schedule() {
     }
   };
 
-    // EmailJSテスト用関数
-  const handleEmailJSTest = async () => {
-    try {
-      setEmailStatus('sending');
-      
-      console.log('🔑 EmailJS接続テスト開始:', {
-        serviceId: EMAILJS_CONFIG.serviceId,
-        templateId: EMAILJS_CONFIG.templateId,
-        publicKey: EMAILJS_CONFIG.publicKey ? `${EMAILJS_CONFIG.publicKey.substring(0, 8)}...` : '未設定'
-      });
-
-      // EmailJS初期化
-      if (!window.emailjs) {
-        throw new Error('EmailJS CDNが読み込まれていません');
-      }
-      window.emailjs.init(EMAILJS_CONFIG.publicKey);
-
-      // テスト用パラメータ
-      const testParams = {
-        customer_name: 'テスト太郎',
-        customer_email: 'manseijaaa@gmail.com',
-        customer_phone: '090-1234-5678',
-        booking_date: new Date().toLocaleDateString('ja-JP'),
-        booking_time: '14:00',
-        booking_id: `test_${Date.now()}`,
-        booking_completed_at: new Date().toLocaleString('ja-JP'),
-        estimate_created_at: new Date().toLocaleString('ja-JP'),
-        base_price: '15,000',
-        total_price: '25,000',
-        estimate_details: 'テスト見積り詳細',
-        admin_email: 'manseijaaa@gmail.com',
-        company_name: '電化のマンセイ',
-        company_address: '〒270-2241 千葉県松戸市松戸新田24',
-        company_hours: '9:00〜18:00（土日祝休み）',
-        company_line: 'https://lin.ee/0OsWYCs',
-        company_contact: 'https://d-mansei.co.jp/contact'
-      };
-
-      console.log('📤 EmailJSテストパラメータ:', {
-        customer_name: testParams.customer_name,
-        customer_email: testParams.customer_email,
-        booking_date: testParams.booking_date,
-        total_price: testParams.total_price
-      });
-
-      // EmailJSでテストメール送信
-      const response = await window.emailjs.send(
-        EMAILJS_CONFIG.serviceId,
-        EMAILJS_CONFIG.templateId,
-        testParams
-      );
-
-      console.log('✅ EmailJSテスト送信成功:', response);
-
-      setEmailStatus('sent');
-      toast({
-        title: "EmailJSテスト成功！",
-        description: "統合メールが正常に送信されました。メールを確認してください。",
-      });
-
-    } catch (error) {
-      console.error('🚨 EmailJSテストエラー:', error);
-      setEmailStatus('failed');
-      toast({
-        title: "EmailJSテスト失敗",
-        description: `エラー: ${error instanceof Error ? error.message : String(error)}`,
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Webhookテスト用関数
-  const handleWebhookTest = async () => {
-    const currentData = getCurrentEstimateData();
-    if (!currentData?.id) {
-      toast({
-        title: "エラー",
-        description: "見積りIDが見つかりません。先に見積りを作成してください。",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      console.log('🔗 Webhookテスト開始 - 見積りID:', currentData.id);
-      
-      // テスト用の予約データを作成
-      const response = await fetch(`/api/webhook/test/${currentData.id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({})
-      });
-
-      console.log('🔗 Webhookレスポンス:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Webhookテスト成功:', result);
-        
-        // テストデータを直接設定
-        const testReservationData = {
-          date: new Date(result.bookingData.start_at).toLocaleDateString('ja-JP'),
-          time: new Date(result.bookingData.start_at).toLocaleTimeString('ja-JP', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }),
-          customerInfo: {
-            name: result.bookingData.attendee?.name || 'テスト花子',
-            email: result.bookingData.attendee?.email || 'test.hanako@example.com',
-            phone: result.bookingData.attendee?.phone || '090-1234-5678'
-          },
-          jicooEventId: result.bookingData.id,
-          completedAt: new Date().toISOString()
-        };
-        
-        setLastBookingData(testReservationData);
-        updateReservationData(testReservationData);
-        
-        toast({
-          title: "Webhookテスト成功！",
-          description: `${testReservationData.customerInfo.name}様のテスト予約データを作成しました。`,
-        });
-        
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Webhookテスト失敗:', {
-          status: response.status,
-          statusText: response.statusText,
-          body: errorText
-        });
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-    } catch (error) {
-      console.error('🚨 Webhookテストエラー:', error);
-      
-      // ネットワークエラーの場合は、ローカルテストデータを作成
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.log('🔄 ネットワークエラー - ローカルテストデータを作成');
-        
-        const fallbackReservationData = {
-          date: new Date().toLocaleDateString('ja-JP'),
-          time: '14:00',
-          customerInfo: {
-            name: 'テスト花子（ローカル）',
-            email: 'test.hanako.local@example.com',
-            phone: '090-1234-5678'
-          },
-          jicooEventId: `local_test_${Date.now()}`,
-          completedAt: new Date().toISOString()
-        };
-        
-        setLastBookingData(fallbackReservationData);
-        updateReservationData(fallbackReservationData);
-        
-        toast({
-          title: "Webhookテスト（ローカル）",
-          description: "サーバー接続失敗のため、ローカルテストデータを作成しました。",
-        });
-      } else {
-        toast({
-          title: "Webhookテストエラー",
-          description: `テストに失敗しました: ${error instanceof Error ? error.message : String(error)}`,
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  // 手動メール送信テスト用関数（EmailJS使用）
-  const handleManualEmailTest = async () => {
-    // 常に新しいテスト用の予約データを作成
-    const testReservationData = {
-      date: new Date().toLocaleDateString('ja-JP'),
-      time: '14:00',
-      customerInfo: {
-        name: 'テスト太郎',
-        email: 'manseijaaa@gmail.com',
-        phone: '090-1234-5678'
-      },
-      jicooEventId: `test_${Date.now()}`,
-      completedAt: new Date().toISOString()
-    };
-    
-    console.log('📧 統合メール送信テスト開始 - テストデータ作成:', testReservationData);
-    
-    setLastBookingData(testReservationData);
-    updateReservationData(testReservationData);
-
-    // EmailJS統合メール送信
-    await sendIntegratedEmail(testReservationData);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-20">
       <div className="max-w-4xl mx-auto px-4">
@@ -625,13 +427,7 @@ export default function Schedule() {
         <Card className="mb-8 border-0 shadow-lg">
           <CardContent className="p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-apple-text mb-4">
-                ご希望の工事日程をお選びください
-              </h2>
-              <p className="text-gray-600 mb-6">
-                下記のカレンダーからご都合の良い日時をお選びいただけます。予約完了後、Webhookを通じて実際の予約情報を取得し、見積り詳細と合わせて確認メールを自動送信いたします。
-              </p>
-              
+              {/* ここにあった見出し・説明文を削除 */}
               {/* ポーリング状況表示 */}
               {isPolling && (
                 <div className="flex items-center space-x-2 p-3 rounded-lg mb-4 bg-blue-50 text-blue-700">
@@ -641,7 +437,6 @@ export default function Schedule() {
                   </span>
                 </div>
               )}
-              
               {/* メール送信ステータス表示 */}
               {emailStatus !== 'pending' && (
                 <div className={`flex items-center space-x-2 p-3 rounded-lg mb-4 ${
@@ -660,70 +455,40 @@ export default function Schedule() {
                 </div>
               )}
             </div>
-            
-            {/* テスト機能 */}
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-lg font-bold mb-2">🧪 EmailJS統合テスト</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                EmailJSを使用した統合メール送信（見積り詳細+予約情報）をテストできます。
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  onClick={handleEmailJSTest}
-                  className="bg-purple-500 hover:bg-purple-600 text-white"
-                  disabled={emailStatus === 'sending'}
-                >
-                  🔑 EmailJS接続テスト
-                </Button>
-                <Button 
-                  onClick={handleManualEmailTest}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                  disabled={emailStatus === 'sending'}
-                >
-                  {emailStatus === 'sending' ? '送信中...' : '📧 統合メール送信テスト'}
-                </Button>
-                <Button 
-                  onClick={handleWebhookTest}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                  disabled={isPolling}
-                >
-                  🔗 Webhookテスト
-                </Button>
-              </div>
-            </div>
-
             {/* 予約完了検知表示 */}
-            {lastBookingData && (
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <h3 className="text-lg font-bold mb-2">✅ 予約完了を検知しました</h3>
-                <div className="text-sm text-gray-600 space-y-1">
+            {lastBookingData && estimateData && (
+              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                <h3 className="text-lg font-bold mb-2">✅ 予約内容・見積もり内容のご確認</h3>
+                <div className="text-sm text-gray-700 space-y-1 mb-2">
                   <p><strong>お客様名:</strong> {lastBookingData.customerInfo?.name}</p>
                   <p><strong>メールアドレス:</strong> {lastBookingData.customerInfo?.email}</p>
                   <p><strong>予約日時:</strong> {lastBookingData.date} {lastBookingData.time}</p>
                   <p><strong>予約ID:</strong> {lastBookingData.jicooEventId}</p>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  統合メールが自動送信されました。
-                </p>
+                <div className="text-sm text-gray-700 mt-4">
+                  <h4 className="font-bold mb-1">【見積もり内容詳細】</h4>
+                  <ul className="list-disc pl-5">
+                    {estimateData.answers && estimateData.answers.map((item: any, idx: number) => (
+                      <li key={idx}>
+                        <span className="font-medium">{item.question}：</span>
+                        {Array.isArray(item.content) ? item.content.join(', ') : item.content}
+                        {item.price ? `（+¥${item.price.toLocaleString()}）` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-2 font-bold">合計金額：¥{estimateData.totalPrice?.toLocaleString() || '要見積'}（税込）</div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">この内容はメールでもお送りしています。</p>
               </div>
             )}
 
             {/* Jicoo Widget */}
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              {jicooUrl ? (
-                <div 
-                  className="jicoo-widget" 
-                  data-url={jicooUrl}
-                  style={{minWidth: '320px', height: '720px', border: '1px solid #e4e4e4', boxSizing: 'content-box'}}
-                ></div>
-              ) : (
-                <div className="flex items-center justify-center h-96">
-                  <div className="text-center">
-                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">予約システムを読み込み中...</p>
-                  </div>
-                </div>
-              )}
+              <div 
+                className="jicoo-widget" 
+                data-url={jicooUrl}
+                style={{minWidth: '320px', height: '720px', border: '1px solid #e4e4e4', boxSizing: 'content-box'}}
+              ></div>
             </div>
           </CardContent>
         </Card>

@@ -1,106 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --background: 0 0% 100%;
-  --foreground: 213 8% 11%; /* #1D1D1F */
-  --muted: 0 0% 96%;
-  --muted-foreground: 0 0% 45%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 213 8% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 213 8% 11%;
-  --border: 0 0% 88%; /* #E0E0E0 */
-  --input: 0 0% 88%;
-  --primary: 211 100% 50%; /* #007AFF Apple Blue */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 96%;
-  --secondary-foreground: 213 8% 11%;
-  --accent: 0 0% 96%;
-  --accent-foreground: 213 8% 11%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 213 8% 11%;
-  --radius: 0.75rem;
-  --success: 142 76% 36%; /* #34C759 Apple Success Green */
+ 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+ 
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+ 
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+ 
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+ 
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+ 
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+ 
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 0 0% 0%;
+ 
+    --radius: 0.5rem;
+  }
 }
-
-.dark {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-  --muted: 240 4% 16%;
-  --muted-foreground: 240 5% 65%;
-  --popover: 240 10% 4%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 4%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 4% 16%;
-  --input: 240 4% 16%;
-  --primary: 211 100% 50%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 240 4% 16%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 240 4% 16%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 240 5% 84%;
-}
-
+ 
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 400;
   }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Noto Sans JP', sans-serif;
-  }
-}
-
-@layer utilities {
-  .font-noto {
-    font-family: 'Noto Sans JP', sans-serif;
-  }
-  
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/* Custom Apple-inspired colors */
-.text-apple-text {
-  color: #1D1D1F;
-}
-
-.text-apple-blue {
-  color: #007AFF;
-}
-
-.bg-apple-blue {
-  background-color: #007AFF;
-}
-
-.border-apple-border {
-  border-color: #E0E0E0;
-}
-
-.bg-apple-success {
-  background-color: #34C759;
-}
-
-.text-apple-success {
-  color: #34C759;
 }

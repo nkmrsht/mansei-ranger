@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -58,7 +60,7 @@ app.use((req, res, next) => {
   }
 
   // Mac対応：localhostでリッスン
-  const port = process.env.PORT || 3002;
+  const port = process.env.PORT || 3001;
   server.listen(Number(port), 'localhost', () => {
     log(`serving on http://localhost:${port}`);
   });

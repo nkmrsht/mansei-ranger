@@ -22,6 +22,7 @@ function isEmailJSConfigured(): boolean {
 export interface JicooWebhookData {
   // 新しい公式仕様（推奨）
   event_type?: 'booking.created' | 'booking.updated' | 'guest_cancelled' | 'host_cancelled';
+  event?: 'guest_booked' | 'guest_cancelled' | 'host_cancelled';  // 新しいイベントタイプ
   booking?: {
     uid: string;
     eventTypeUid: string;
@@ -29,7 +30,7 @@ export interface JicooWebhookData {
     endedAt: string;   // ISO 8601形式
     timeZone: string;
     location?: string;
-    status: 'confirmed' | 'cancel';
+    status: 'confirmed' | 'cancel' | 'open';  // 'open'ステータスを追加
     contact: {
       name: string;
       email: string;
@@ -54,7 +55,6 @@ export interface JicooWebhookData {
   };
   
   // 旧形式との互換性（テスト用）
-  event?: string;
   data?: {
     id: string;
     title?: string;
@@ -76,6 +76,34 @@ export interface JicooWebhookData {
   };
   
   createdAt?: string; // Webhook送信時刻
+  object?: {  // 新しいオブジェクト形式
+    uid: string;
+    eventTypeUid: string;
+    startedAt: string;
+    endedAt: string;
+    status: string;
+    timeZone: string;
+    cancelReason: string | null;
+    cancelledAt: string | null;
+    cancelledBy: string | null;
+    contact: {
+      name: string;
+      email: string;
+    };
+    answers: Array<{
+      question: string;
+      content: string[];
+    }>;
+    tracking: {
+      utm_campaign: string | null;
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_content: string | null;
+      utm_term: string | null;
+    };
+    updatedAt: string;
+    createdAt: string;
+  };
 }
 
 export interface EstimateWebhookData {
@@ -94,6 +122,31 @@ export interface EstimateWebhookData {
 
 // Webhookデータから統一された予約情報を抽出
 function extractBookingInfo(webhookData: JicooWebhookData) {
+  // 新しいオブジェクト形式の場合
+  if (webhookData.event === 'guest_booked' && webhookData.object) {
+    return {
+      id: webhookData.object.uid,
+      eventType: webhookData.event,
+      startTime: webhookData.object.startedAt,
+      endTime: webhookData.object.endedAt,
+      timezone: webhookData.object.timeZone,
+      location: undefined,
+      status: webhookData.object.status,
+      customer: {
+        name: webhookData.object.contact.name,
+        email: webhookData.object.contact.email,
+        phone: undefined
+      },
+      answers: webhookData.object.answers || [],
+      tracking: webhookData.object.tracking,
+      createdAt: webhookData.object.createdAt,
+      updatedAt: webhookData.object.updatedAt,
+      cancelledAt: webhookData.object.cancelledAt,
+      cancelledBy: webhookData.object.cancelledBy,
+      cancelReason: webhookData.object.cancelReason
+    };
+  }
+
   // 新しい公式仕様の場合
   if (webhookData.event_type && webhookData.booking) {
     return {
@@ -344,158 +397,99 @@ function generateEstimateDetails(estimateData: EstimateWebhookData): string {
 // Jicoo公式仕様準拠 Webhookハンドラー
 export async function handleJicooWebhook(req: Request, res: Response) {
   try {
-    const timestamp = new Date().toISOString();
-    console.log(`🔔 [${timestamp}] Jicoo Webhook受信 START =================`);
-    console.log('📝 リクエストヘッダー:', JSON.stringify(req.headers, null, 2));
-    console.log('📝 クエリパラメータ:', JSON.stringify(req.query, null, 2));
+    console.log('🔔 Jicoo Webhook受信:', JSON.stringify(req.body, null, 2));
+    
+    // リクエストの詳細をログ出力
+    console.log('🔔 [' + new Date().toISOString() + '] Jicoo Webhook受信 START =================');
+    console.log('📝 リクエストヘッダー:', req.headers);
+    console.log('📝 クエリパラメータ:', req.query);
     console.log('📝 リクエストボディ:', JSON.stringify(req.body, null, 2));
     console.log('🔔 Webhook受信詳細情報 END ===================');
+
+    const webhookData = req.body as JicooWebhookData;
     
-    // Jicoo公式仕様とテスト用の両方に対応
-    let jicooData: JicooWebhookData;
-    let eventType: string;
-    let bookingData: any;
-    
-    // 公式仕様の形式をチェック
-    if (req.body.event_type && req.body.booking) {
-      console.log('✅ Jicoo公式仕様形式を検出');
-      eventType = req.body.event_type;
-      bookingData = req.body.booking;
-      console.log('公式仕様 eventType:', eventType);
-    } 
-    // テスト用の旧形式にも対応
-    else if (req.body.event && req.body.data) {
-      console.log('✅ テスト用旧形式を検出');
-      eventType = req.body.event;
-      bookingData = {
-        id: req.body.data.id,
-        start_at: req.body.data.start_time,
-        end_at: req.body.data.end_time,
-        timezone: req.body.data.timezone,
-        attendee: req.body.data.attendees?.[0] || {},
-        host: req.body.data.host || {},
-        created_at: req.body.data.created_at,
-        updated_at: req.body.data.updated_at
+    // 新しいWebhook形式の検証
+    if (webhookData.event === 'guest_booked' && webhookData.object) {
+      const bookingInfo = extractBookingInfo(webhookData);
+      
+      // 予約データを保存
+      const reservationData = {
+        id: bookingInfo.id,
+        start_at: bookingInfo.startTime,
+        end_at: bookingInfo.endTime,
+        timezone: bookingInfo.timezone,
+        attendee: {
+          name: bookingInfo.customer.name,
+          email: bookingInfo.customer.email
+        },
+        host: {
+          name: '電化のマンセイ',
+          email: 'info@d-mansei.co.jp'
+        },
+        created_at: bookingInfo.createdAt,
+        updated_at: bookingInfo.updatedAt
       };
-    } else {
-      console.error('❌ 不明なWebhook形式:', req.body);
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Invalid webhook format' 
-      });
-    }
-    
-    // 対応するイベントタイプをチェック
-    console.log('受信イベントタイプ:', eventType);
-    if (eventType !== 'booking.created' && eventType !== 'booking_created' && eventType !== 'appointment.booked' && eventType !== 'booking.created') {
-      console.log('処理対象外のイベント:', eventType);
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Event received but not processed',
-        event_type: eventType 
-      });
-    }
-
-    // 見積りデータの取得（クエリパラメータまたはリクエストボディから）
-    let estimateData: EstimateWebhookData | undefined;
-    const estimateId = req.query?.estimate_id as string || req.body?.estimate_id as string;
-    
-    if (estimateId) {
-      console.log('見積りID受信:', estimateId);
-      // 実際の実装では、ここで見積りデータを取得
-      // 今回はテスト用の見積りデータを生成
-      estimateData = {
-        estimateId: estimateId,
-        customerEmail: bookingData.contact?.email || bookingData.attendee?.email,
-        answers: [
-          {
-            questionId: "location",
-            selectedOption: 0,
-            optionLabel: "リビング・ダイニング",
-            price: 0
-          },
-          {
-            questionId: "piping",
-            selectedOption: 1,
-            optionLabel: "穴あけ工事が必要",
-            price: 5000
-          },
-          {
-            questionId: "electrical",
-            selectedOption: 1,
-            optionLabel: "専用回路なし（新設が必要）",
-            price: 8000
-          }
-        ],
-        totalPrice: 32000,
-        basePrice: 19000,
-        createdAt: new Date().toISOString()
-      };
-      console.log('見積りデータを生成しました:', estimateData);
-    } else {
-      console.log('見積りIDが提供されていません。基本料金のみで処理します。');
-    }
-
-    // お客様情報のバリデーション（公式仕様対応）
-    let customer;
-    if (bookingData.contact) {
-      // 公式仕様の場合
-      customer = bookingData.contact;
-    } else if (bookingData.attendee) {
-      // 旧形式の場合
-      customer = bookingData.attendee;
-    } else {
-      console.error('お客様情報がありません');
-      return res.status(400).json({ 
-        success: false, 
-        error: 'No customer information found' 
-      });
-    }
-
-    if (!customer || !customer.email) {
-      console.error('お客様のメールアドレスがありません');
-      return res.status(400).json({ 
-        success: false, 
-        error: 'No customer email found' 
-      });
-    }
-    console.log('お客様情報:', {
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      reservationDate: bookingData.start_at
-    });
-
-    // 確認メール送信
-    const emailSuccess = await sendConfirmationEmail(req.body, estimateData);
-    
-    if (!emailSuccess) {
-      console.warn('⚠️ メール送信に失敗しましたが、処理は続行します');
-    }
-
-    // レスポンス返却（公式仕様対応）
-    res.status(200).json({
-      success: true,
-      message: 'Webhook processed successfully',
-      data: {
-        reservationId: bookingData.uid || bookingData.id,
-        customerName: customer.name,
-        customerEmail: customer.email,
-        reservationDate: bookingData.startedAt || bookingData.start_at,
-        emailSent: emailSuccess,
-        estimateId: estimateId || null,
-        eventType: eventType
+      
+      console.log('📝 予約データを保存:', bookingInfo.id, reservationData);
+      
+      // メール送信
+      const emailSent = await sendConfirmationEmail(webhookData);
+      if (emailSent) {
+        console.log('📧 確認メール送信成功:', bookingInfo.id);
+      } else {
+        console.warn('⚠️ 確認メール送信失敗:', bookingInfo.id);
       }
-    });
-
-  } catch (error) {
-    console.error('Webhook処理エラー:', error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      });
+      
+      return res.json({ success: true });
     }
+    
+    // 旧形式のWebhook処理
+    if (webhookData.event_type === 'booking.created' && webhookData.booking) {
+      const bookingInfo = extractBookingInfo(webhookData);
+      
+      // 予約データを保存
+      const reservationData = {
+        id: bookingInfo.id,
+        start_at: bookingInfo.startTime,
+        end_at: bookingInfo.endTime,
+        timezone: bookingInfo.timezone,
+        attendee: {
+          name: bookingInfo.customer.name,
+          email: bookingInfo.customer.email
+        },
+        host: {
+          name: '電化のマンセイ',
+          email: 'info@d-mansei.co.jp'
+        },
+        created_at: bookingInfo.createdAt,
+        updated_at: bookingInfo.updatedAt
+      };
+      
+      console.log('📝 予約データを保存:', bookingInfo.id, reservationData);
+      
+      // メール送信
+      const emailSent = await sendConfirmationEmail(webhookData);
+      if (emailSent) {
+        console.log('📧 確認メール送信成功:', bookingInfo.id);
+      } else {
+        console.warn('⚠️ 確認メール送信失敗:', bookingInfo.id);
+      }
+      
+      return res.json({ success: true });
+    }
+    
+    // 不明なWebhook形式
+    console.error('❌ 不明なWebhook形式:', webhookData);
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Invalid webhook format' 
+    });
+    
+  } catch (error) {
+    console.error('❌ Webhook処理エラー:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
   }
 }

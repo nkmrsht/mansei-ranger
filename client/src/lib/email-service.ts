@@ -150,8 +150,10 @@ function generateEstimateDetails(estimateData: SavedEstimateData['estimateData']
 export async function sendEmailWithRetry(
   data: EmailData, 
   maxRetries: number = 3,
-  useEmailJS: boolean = false
+  useEmailJS: boolean = true
 ): Promise<boolean> {
+  let lastError: Error | null = null;
+  
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`メール送信試行 ${attempt}/${maxRetries}`);
@@ -165,15 +167,64 @@ export async function sendEmailWithRetry(
         return true;
       }
     } catch (error) {
-      console.error(`メール送信失敗 (試行${attempt}):`, error);
-    }
-    
-    // 最後の試行でなければ待機
-    if (attempt < maxRetries) {
-      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(`メール送信失敗 (試行${attempt}):`, lastError);
+      
+      // 最後の試行でなければ待機
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // 指数バックオフ、最大10秒
+        console.log(`次の試行まで${delay}ms待機...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
   }
   
-  console.error(`メール送信失敗 (${maxRetries}回試行)`);
+  console.error(`メール送信失敗 (${maxRetries}回試行)`, lastError);
   return false;
+}
+
+// メール送信状態の監視
+export function monitorEmailStatus(
+  onSuccess: () => void,
+  onError: (error: Error) => void,
+  onRetry: (attempt: number, maxRetries: number) => void
+) {
+  return {
+    onSuccess,
+    onError,
+    onRetry,
+    getStatus: () => ({
+      isSending: false,
+      lastError: null,
+      retryCount: 0
+    })
+  };
+}
+
+// メール送信のバリデーション
+export function validateEmailData(data: EmailData): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  
+  if (!data.customerEmail) {
+    errors.push('顧客のメールアドレスが設定されていません');
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.customerEmail)) {
+    errors.push('顧客のメールアドレスの形式が正しくありません');
+  }
+  
+  if (!data.customerName) {
+    errors.push('顧客名が設定されていません');
+  }
+  
+  if (!data.estimateData) {
+    errors.push('見積りデータが設定されていません');
+  }
+  
+  if (!data.reservationData) {
+    errors.push('予約データが設定されていません');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
 }

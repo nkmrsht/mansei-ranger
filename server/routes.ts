@@ -2,9 +2,13 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { handleJicooWebhook } from "./webhook-handlers";
+import { v4 as uuidv4 } from "uuid";
 
 // 予約データの一時保存用（本番環境ではRedisやDBを使用）
 const bookingDataStore = new Map<string, any>();
+
+// 見積りデータの一時保存用（本番環境ではDB等を推奨）
+const estimateDataStore = new Map<string, any>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Jicoo Webhook エンドポイント（APIルートとして）
@@ -279,6 +283,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       count: allData.length,
       bookings: allData
     });
+  });
+
+  // 見積り内容を一時保存するAPI
+  app.post('/api/estimate', (req, res) => {
+    const data = req.body; // フォームの内容
+    const id = uuidv4();   // 一意のIDを発行
+    estimateDataStore.set(id, { ...data, createdAt: new Date().toISOString() });
+    res.json({ id });      // IDを返す
   });
 
   const httpServer = createServer(app);
