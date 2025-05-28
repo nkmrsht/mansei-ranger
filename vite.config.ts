@@ -7,6 +7,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+console.log("DEBUG __dirname:", __dirname);
+console.log("DEBUG client/src:", path.resolve(__dirname, "client", "src"));
+console.log("DEBUG shared:", path.resolve(__dirname, "shared"));
+console.log("DEBUG attached_assets:", path.resolve(__dirname, "attached_assets"));
+console.log("DEBUG client:", path.resolve(__dirname, "client"));
+console.log("DEBUG dist/public:", path.resolve(__dirname, "dist/public"));
+
 export default defineConfig(async () => {
   const plugins = [
     react(),
