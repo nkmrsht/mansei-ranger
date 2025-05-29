@@ -49,8 +49,8 @@ export default function Hero() {
 
         <div className="mb-12 rounded-2xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
           <img 
-            src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=800" 
-            alt="Professional air conditioning installation" 
+            src="https://placehold.jp/cccccc/ffffff/1200x800.png?text=SAMPLE" 
+            alt="SAMPLE" 
             className="w-full h-auto" 
           />
         </div>

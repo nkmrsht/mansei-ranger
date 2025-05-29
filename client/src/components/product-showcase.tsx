@@ -8,7 +8,7 @@ export default function ProductShowcase() {
       price: "¥85,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
+      image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE"
     },
     {
       name: "パナソニック CS-225DFL",
@@ -16,7 +16,7 @@ export default function ProductShowcase() {
       price: "¥105,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
+      image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE"
     },
     {
       name: "パナソニック CS-225DEX",
@@ -24,7 +24,7 @@ export default function ProductShowcase() {
       price: "¥174,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
+      image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE"
     },
 
   ];
