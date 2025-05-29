@@ -4,6 +4,13 @@ import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
 dotenv.config();
 
+// 環境変数の確認
+console.log('EmailJS設定:', {
+  serviceId: process.env.EMAILJS_SERVICE_ID,
+  templateId: process.env.EMAILJS_TEMPLATE_ID,
+  publicKey: process.env.EMAILJS_PUBLIC_KEY
+});
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

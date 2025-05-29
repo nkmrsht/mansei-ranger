@@ -7,6 +7,7 @@ const emailJSConfig = {
   templateId: process.env.EMAILJS_TEMPLATE_ID || "your_template_id", 
   publicKey: process.env.EMAILJS_PUBLIC_KEY || "your_public_key"
 };
+console.log('ENV:', process.env.EMAILJS_SERVICE_ID, process.env.EMAILJS_TEMPLATE_ID, process.env.EMAILJS_PUBLIC_KEY);
 
 // 設定チェック関数
 function isEmailJSConfigured(): boolean {
