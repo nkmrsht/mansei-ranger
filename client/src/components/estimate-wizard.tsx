@@ -8,42 +8,106 @@ import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAns
 import { saveEstimateData } from "@/lib/estimate-storage";
 import { useToast } from "@/hooks/use-toast";
 
+// 設問の型定義
+type Question = {
+  id: string;
+  question: string;
+  options: Array<{
+    label: string;
+    price: number;
+  }>;
+  help: {
+    reason: string;
+    guide: string;
+  };
+};
+
+type QuestionWithSection = Question & {
+  sectionTitle: string;
+};
+
+// 詳細な回答の型定義
+type DetailedAnswer = {
+  questionId: string;
+  selectedOption: number;
+  optionLabel: string;
+  price: number;
+};
+
+// 見積りデータの型定義
+type EstimateResult = {
+  answers: DetailedAnswer[];
+  totalPrice: number;
+  basePrice: number;
+  createdAt: string;
+};
+
 export default function EstimateWizard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isStarted, setIsStarted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<EstimateAnswer[]>([]);
   const [showHelp, setShowHelp] = useState(false);
   const [helpContent, setHelpContent] = useState({ reason: "", guide: "" });
   const questionCardRef = useRef<HTMLDivElement>(null);
 
-  // 全質問を平坦化
-  const allQuestions = estimateData.flatMap(section => 
-    section.questions.map(q => ({ ...q, sectionTitle: section.title }))
-  );
-
-  const currentQuestionData = allQuestions[currentStep];
-  const isLastQuestion = currentStep === allQuestions.length - 1;
-
-  // 選択されたプランを取得
+  // 選択されたプランを取得（先に定義）
   const getSelectedPlan = () => {
     const planAnswer = answers.find(a => a.questionId === "plan-selection");
     return planAnswer ? planAnswer.selectedOption : -1;
   };
 
+  // 進行中の設問IDリストをanswersから都度生成
+  const getAllQuestionIds = () => {
+    const ids = ["plan-selection"];
+    const plan = answers.find(a => a.questionId === "plan-selection")?.selectedOption;
+    if (plan === undefined) return ids;
+
+    if (plan === 1) ids.push("model-size-selection-ac22tfc");
+    if (plan === 2) ids.push("model-size-selection-csf225dw");
+    if (plan === 3) ids.push("model-size-selection-csex225dw");
+    // 工事のみ（plan === 0）は畳数設問をスキップ
+
+    // 共通設問IDをcommon.questionsから取得して追加
+    const commonSection = estimateData.find(s => s.id === "common");
+    if (commonSection) {
+      ids.push(...commonSection.questions.map(q => q.id));
+    }
+    return ids;
+  };
+
+  const questionIds = getAllQuestionIds();
+  const currentQuestionId = questionIds[currentStep];
+  const totalQuestions = questionIds.length;
+
+  // 現在の設問データ
+  const currentQuestionData = (() => {
+    if (!currentQuestionId) return null;
+    for (const section of estimateData) {
+      const question = section.questions.find(q => q.id === currentQuestionId);
+      if (question) {
+        return { ...question, sectionTitle: section.title } as QuestionWithSection;
+      }
+    }
+    return null;
+  })();
+
+  const isLastQuestion = currentStep === totalQuestions - 1;
+
   // 料金計算
   const calculateTotal = () => {
     let total = BASE_INSTALLATION_PRICE;
     answers.forEach(answer => {
-      const question = allQuestions.find(q => q.id === answer.questionId);
+      const question = estimateData.find(s => s.questions.some(q => q.id === answer.questionId));
       if (question) {
-        const option = question.options[answer.selectedOption];
-        total += option.price;
-        // カスタム値がある場合（延長料金など）
-        if (answer.customValue) {
-          total += answer.customValue;
+        const option = question.questions.find(q => q.id === answer.questionId)?.options[answer.selectedOption];
+        if (option) {
+          total += option.price;
+          // カスタム値がある場合（延長料金など）
+          if (answer.customValue) {
+            total += answer.customValue;
+          }
         }
       }
     });
@@ -51,6 +115,8 @@ export default function EstimateWizard() {
   };
 
   const handleOptionSelect = (optionIndex: number) => {
+    if (!currentQuestionData) return;
+
     const newAnswer: EstimateAnswer = {
       questionId: currentQuestionData.id,
       selectedOption: optionIndex
@@ -69,9 +135,9 @@ export default function EstimateWizard() {
         const total = calculateTotal();
         
         // 詳細な回答データを作成
-        const detailedAnswers = answers.map(answer => {
-          const question = allQuestions.find(q => q.id === answer.questionId);
-          const option = question?.options[answer.selectedOption];
+        const detailedAnswers: DetailedAnswer[] = answers.map(answer => {
+          const question = estimateData.find(s => s.questions.some(q => q.id === answer.questionId));
+          const option = question?.questions.find(q => q.id === answer.questionId)?.options[answer.selectedOption];
           return {
             questionId: answer.questionId,
             selectedOption: answer.selectedOption,
@@ -81,14 +147,14 @@ export default function EstimateWizard() {
         });
 
         // 見積りデータを保存
-        const estimateData = {
+        const estimateResult: EstimateResult = {
           answers: detailedAnswers,
           totalPrice: total,
           basePrice: BASE_INSTALLATION_PRICE,
           createdAt: new Date().toISOString()
         };
 
-        const estimateId = saveEstimateData(estimateData);
+        const estimateId = saveEstimateData(estimateResult);
         
         // 既存のlocalStorageも維持（既存機能との互換性のため）
         localStorage.setItem('estimateResult', JSON.stringify({
@@ -128,29 +194,12 @@ export default function EstimateWizard() {
   };
 
   const getCurrentAnswer = () => {
+    if (!currentQuestionData) return undefined;
     return answers.find(a => a.questionId === currentQuestionData.id);
   };
 
   const canProceed = () => {
     return getCurrentAnswer() !== undefined;
-  };
-
-  // 次の質問を取得
-  const getNextQuestion = () => {
-    const selectedPlan = getSelectedPlan();
-    
-    // プラン選択後、本体＋工事セットを選んだ場合は畳数選択へ
-    if (currentQuestionData.id === "plan-selection" && selectedPlan > 0) {
-      return 1; // 畳数選択へ
-    }
-    
-    // 畳数選択後は共通設問へ
-    if (currentQuestionData.id === "model-size-selection") {
-      return 2; // 共通設問へ
-    }
-    
-    // その他の場合は次の質問へ
-    return currentStep + 1;
   };
 
   if (!isStarted) {
@@ -246,16 +295,16 @@ export default function EstimateWizard() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm text-gray-600">
-              質問 {currentStep + 1} / {allQuestions.length}
+              質問 {currentStep + 1} / {totalQuestions}
             </span>
             <span className="text-sm text-gray-600">
-              {currentQuestionData.sectionTitle}
+              {currentQuestionData?.sectionTitle}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentStep + 1) / allQuestions.length) * 100}%` }}
+              style={{ width: `${((currentStep + 1) / totalQuestions) * 100}%` }}
             />
           </div>
         </div>
@@ -264,94 +313,102 @@ export default function EstimateWizard() {
         <div ref={questionCardRef}></div>
 
         {/* 質問カード */}
-        <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-8">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <div className="flex items-center mb-3">
-                  <div className="w-3 h-3 bg-primary rounded-full mr-3"></div>
-                  <span className="text-sm font-medium text-primary">質問 {currentStep + 1}</span>
+        {currentQuestionData && (
+          <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <div className="flex items-center mb-3">
+                    <div className="w-3 h-3 bg-primary rounded-full mr-3"></div>
+                    <span className="text-sm font-medium text-primary">質問 {currentStep + 1}</span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-apple-text leading-relaxed">
+                    {currentQuestionData.question}
+                  </h2>
                 </div>
-                <h2 className="text-2xl font-bold text-apple-text leading-relaxed">
-                  {currentQuestionData.question}
-                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleHelp(currentQuestionData.help.reason, currentQuestionData.help.guide)}
+                  className="text-sky-500 hover:text-sky-600 flex items-center space-x-2 bg-gradient-to-r from-sky-50 to-blue-50 hover:from-sky-100 hover:to-blue-100 rounded-full px-4 py-2 border border-sky-200/50 shadow-sm"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">ヘルプ</span>
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleHelp(currentQuestionData.help.reason, currentQuestionData.help.guide)}
-                className="text-sky-500 hover:text-sky-600 flex items-center space-x-2 bg-gradient-to-r from-sky-50 to-blue-50 hover:from-sky-100 hover:to-blue-100 rounded-full px-4 py-2 border border-sky-200/50 shadow-sm"
-              >
-                <HelpCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">ヘルプ</span>
-              </Button>
-            </div>
 
-            <div className="space-y-4">
-              {currentQuestionData.options.map((option, index) => {
-                const isSelected = getCurrentAnswer()?.selectedOption === index;
-                return (
-                  <div key={index}>
-                    <button
-                      onClick={() => handleOptionSelect(index)}
-                      className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 transform hover:scale-[1.02] ${
-                        isSelected 
-                          ? 'border-primary bg-gradient-to-r from-primary/5 to-blue-50 shadow-md' 
-                          : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
-                            isSelected ? 'border-primary bg-primary' : 'border-gray-300'
-                          }`}>
-                            {isSelected && (
-                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            )}
-                          </div>
-                          <span className="font-medium text-gray-800">{option.label}
-                            {currentQuestionData.id === 'outlet-exists' && index === 1 && (
-                              <span className="block text-xs text-blue-600 mt-1">
-                                ※別途費用がかかります。現地調査時にご相談となります。
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                        {option.price > 0 && (
-                          <div className="bg-primary/10 px-3 py-1 rounded-full">
-                            <span className="font-bold text-primary text-sm">
-                              +¥{option.price.toLocaleString()}（税込）
+              <div className="space-y-4">
+                {currentQuestionData.options.map((option, index) => {
+                  const isSelected = getCurrentAnswer()?.selectedOption === index;
+                  // 「※」で分割
+                  const [mainLabel, subText] = option.label.split('※');
+                  return (
+                    <div key={index}>
+                      <button
+                        onClick={() => handleOptionSelect(index)}
+                        className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 transform hover:scale-[1.02] ${
+                          isSelected 
+                            ? 'border-primary bg-gradient-to-r from-primary/5 to-blue-50 shadow-md' 
+                            : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
+                              isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                            }`}>
+                              {isSelected && (
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="font-medium text-gray-800">{mainLabel}
+                              {currentQuestionData.id === 'outlet-exists' && index === 1 && (
+                                <span className="block text-xs text-blue-600 mt-1">
+                                  ※別途費用がかかります。現地調査時にご相談となります。
+                                </span>
+                              )}
                             </span>
                           </div>
+                          {option.price > 0 && (
+                            <div className="bg-primary/10 px-3 py-1 rounded-full">
+                              <span className="font-bold text-primary text-sm">
+                                +¥{option.price.toLocaleString()}（税込）
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {/* サブテキストがあれば下に青字で表示 */}
+                        {subText && (
+                          <span className="block text-xs text-blue-600 mt-1">※{subText}</span>
                         )}
-                      </div>
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            {/* プラン選択のときだけ商品リンクを表示 */}
-            {currentQuestionData.id === 'plan-selection' && (
-              <div className="mt-6 text-center">
-                <a
-                  href="#product-showcase"
-                  className="text-blue-600 underline hover:text-blue-800 text-sm font-medium"
-                  onClick={e => {
-                    e.preventDefault();
-                    const el = document.getElementById('product-showcase');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  商品の詳細についてはこちら
-                </a>
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </CardContent>
-        </Card>
+              {/* プラン選択のときだけ商品リンクを表示 */}
+              {currentQuestionData.id === 'plan-selection' && (
+                <div className="mt-6 text-center">
+                  <a
+                    href="#product-showcase"
+                    className="text-blue-600 underline hover:text-blue-800 text-sm font-medium"
+                    onClick={e => {
+                      e.preventDefault();
+                      const el = document.getElementById('product-showcase');
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  >
+                    商品の詳細についてはこちら
+                  </a>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* ナビゲーション */}
         <div className="flex justify-between items-center">

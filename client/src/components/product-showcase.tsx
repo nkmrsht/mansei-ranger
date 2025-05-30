@@ -7,7 +7,7 @@ export default function ProductShowcase() {
     {
       name: "シャープ AC-22TFC",
       specs: "6畳用｜シャープ独自の省エネ＆コンパクト設計、寝室・子供部屋に最適なベーシックモデル",
-      price: "¥85,000",
+      price: "¥86,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
       image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE",
@@ -16,12 +16,17 @@ export default function ProductShowcase() {
         description: "※本商品（AC-22TFC）は専門店モデルのため、公式サイトには掲載がありません。\n同等仕様のモデル「AC-22TFE」の公式製品ページを参考にご覧ください。",
         linkText: "AC-22TFE（シャープ公式）",
         url: "https://jp.sharp/business/aircon/products/tfe/"
-      }
+      },
+      extraSizes: [
+        { label: "8畳用", price: "¥99,000（税込）" },
+        { label: "10畳用", price: "¥111,000（税込）" },
+        { label: "12畳用", price: "¥122,000（税込）" },
+      ]
     },
     {
       name: "パナソニック CS-F225D-W",
       specs: "6畳用｜ナノイーX搭載で空気も清潔。お手入れ簡単・快適スタンダード機種",
-      price: "¥106,000",
+      price: "¥103,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
       image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE",
@@ -30,12 +35,17 @@ export default function ProductShowcase() {
         description: "※本商品（CS-F225D-W）は専門店モデルのため、公式サイトには掲載がありません。\n同等仕様のモデル「CS-225DFL」の公式製品ページを参考にご覧ください。",
         linkText: "CS-225DFL（パナソニック公式）",
         url: "https://panasonic.jp/housing-aircon/products/CS-225DFL.html"
-      }
+      },
+      extraSizes: [
+        { label: "8畳用", price: "¥114,000（税込）" },
+        { label: "10畳用", price: "¥126,000（税込）" },
+        { label: "12畳用", price: "¥142,000（税込）" },
+      ]
     },
     {
       name: "パナソニック CS-EX225D-W",
       specs: "6畳用｜最高クラスの省エネ＆快適性。自動お掃除＆AI快適制御搭載のプレミアムモデル",
-      price: "¥175,000",
+      price: "¥163,000",
       originalPrice: "",
       discount: "標準取付工事費用込み",
       image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE",
@@ -44,7 +54,12 @@ export default function ProductShowcase() {
         description: "※本商品（CS-EX225D-W）は専門店モデルのため、公式サイトには掲載がありません。\n同等仕様のモデル「CS-225DEX」の公式製品ページを参考にご覧ください。",
         linkText: "CS-225DEX（パナソニック公式）",
         url: "https://panasonic.jp/housing-aircon/products/CS-225DEX.html"
-      }
+      },
+      extraSizes: [
+        { label: "8畳用", price: "¥185,000（税込）" },
+        { label: "10畳用", price: "¥197,000（税込）" },
+        { label: "12畳用", price: "¥207,000（税込）" },
+      ]
     },
   ];
   const extraSizes = [
@@ -98,7 +113,7 @@ export default function ProductShowcase() {
                     </div>
                   </div>
                   <div className="mt-4 mb-2">
-                    {extraSizes.map((size, i) => (
+                    {product.extraSizes.map((size, i) => (
                       <div key={i} className="flex justify-between items-center py-1 border-b last:border-b-0 border-gray-100 text-sm">
                         <span className="font-medium text-gray-700">{size.label}</span>
                         <span className="text-primary font-bold">{size.price.replace('（税込）', '')}<span className="text-xs text-gray-500 font-normal ml-1">（税込）</span></span>

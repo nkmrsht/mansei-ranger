@@ -61,20 +61,48 @@ export const estimateData: EstimateSection[] = [
   },
   {
     id: "model-size",
-    title: "機種・畳数選択",
+    title: "畳数・金額選択",
     questions: [
       {
-        id: "model-size-selection",
-        question: "畳数・金額を選択してください",
+        id: "model-size-selection-ac22tfc",
+        question: "畳数・金額を選択してください（シャープ AC-22TFC）",
         options: [
-          { label: "6畳用 ¥199,999（税込）", price: 199999 },
-          { label: "8畳用 ¥199,999（税込）", price: 199999 },
-          { label: "10畳用 ¥199,999（税込）", price: 199999 },
-          { label: "12畳用 ¥199,999（税込）", price: 199999 }
+          { label: "6畳用 ¥67,000（税込）", price: 67000 },
+          { label: "8畳用 ¥80,000（税込）", price: 80000 },
+          { label: "10畳用 ¥92,000（税込）", price: 92000 },
+          { label: "12畳用 ¥103,000（税込）", price: 103000 }
         ],
         help: {
-          reason: "お部屋の広さに合わせて最適な機種をお選びいただくため、畳数を確認させていただきます。",
-          guide: "お部屋の広さに応じて、最適な機種をお選びください。"
+          reason: "お部屋の広さに合わせて最適な畳数をお選びいただくため、畳数を確認させていただきます。",
+          guide: "AC-22TFCを選んだ方専用の畳数・金額です。"
+        }
+      },
+      {
+        id: "model-size-selection-csf225dw",
+        question: "畳数・金額を選択してください（パナソニック CS-F225D-W）",
+        options: [
+          { label: "6畳用 ¥84,000（税込）", price: 84000 },
+          { label: "8畳用 ¥95,000（税込）", price: 95000 },
+          { label: "10畳用 ¥107,000（税込）", price: 107000 },
+          { label: "12畳用 ¥123,000（税込）", price: 123000 }
+        ],
+        help: {
+          reason: "お部屋の広さに合わせて最適な畳数をお選びいただくため、畳数を確認させていただきます。",
+          guide: "CS-F225D-Wを選んだ方専用の畳数・金額です。"
+        }
+      },
+      {
+        id: "model-size-selection-csex225dw",
+        question: "畳数・金額を選択してください（パナソニック CS-EX225D-W）",
+        options: [
+          { label: "6畳用 ¥144,000（税込）", price: 144000 },
+          { label: "8畳用 ¥166,000（税込）", price: 166000 },
+          { label: "10畳用 ¥178,000（税込）", price: 178000 },
+          { label: "12畳用 ¥188,000（税込）", price: 188000 }
+        ],
+        help: {
+          reason: "お部屋の広さに合わせて最適な畳数をお選びいただくため、畳数を確認させていただきます。",
+          guide: "CS-EX225D-Wを選んだ方専用の畳数・金額です。"
         }
       }
     ]
@@ -129,7 +157,7 @@ export const estimateData: EstimateSection[] = [
         options: [
           { label: "4m以内", price: 0 },
           { label: "4～8m", price: 13200 },
-          { label: "それ以上（要相談）", price: 0 },
+          { label: "それ以上※別途費用がかかります。現地調査時にご相談となります。", price: 0 },
           { label: "わからない", price: 0 }
         ],
         help: {
