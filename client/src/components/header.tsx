@@ -15,8 +15,21 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-0 md:px-8 py-2 md:py-1 flex items-center justify-between">
         {/* スマホ：現状維持 */}
         <div className="block md:hidden w-full overflow-x-hidden">
-          <div className="whitespace-nowrap animate-marquee font-bold text-base text-white leading-tight" style={{animation: 'marquee 100s linear infinite'}}>
-            エアコン取付のみ・本体持込も大歓迎！ネットや他店で購入したエアコンもOK。地域密着のプロが明朗会計＆安心施工でスピード対応。ご自宅・店舗・オフィス・引越しや移設もご相談OK。全メーカー・全機種対応、相談・見積り無料！
+          <style>{`
+            @keyframes marquee {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+          `}</style>
+          <div className="w-full overflow-x-hidden">
+            <div className="flex whitespace-nowrap font-bold text-base text-white leading-tight animate-marquee" style={{animation: 'marquee 100s linear infinite'}}>
+              <span>
+                エアコン取付のみ・本体持込も大歓迎！ネットや他店で購入したエアコンもOK。地域密着のプロが明朗会計＆安心施工でスピード対応。ご自宅・店舗・オフィス・引越しや移設もご相談OK。全メーカー・全機種対応、相談・見積り無料！
+              </span>
+              <span className="ml-12">
+                エアコン取付のみ・本体持込も大歓迎！ネットや他店で購入したエアコンもOK。地域密着のプロが明朗会計＆安心施工でスピード対応。ご自宅・店舗・オフィス・引越しや移設もご相談OK。全メーカー・全機種対応、相談・見積り無料！
+              </span>
+            </div>
           </div>
         </div>
         {/* PC：世界的Webデザイナー風 */}

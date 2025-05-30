@@ -19,7 +19,7 @@ export default function ProductShowcase() {
       }
     },
     {
-      name: "パナソニック CS-225DFL",
+      name: "パナソニック CS-F225D-W",
       specs: "6畳用｜ナノイーX搭載で空気も清潔。お手入れ簡単・快適スタンダード機種",
       price: "¥106,000",
       originalPrice: "",
@@ -27,13 +27,13 @@ export default function ProductShowcase() {
       image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE",
       modelKey: "panasonic-cs225dfl",
       reference: {
-        description: "商品の詳細については、公式製品ページをご参照ください。",
+        description: "※本商品（CS-F225D-W）は専門店モデルのため、公式サイトには掲載がありません。\n同等仕様のモデル「CS-225DFL」の公式製品ページを参考にご覧ください。",
         linkText: "CS-225DFL（パナソニック公式）",
         url: "https://panasonic.jp/housing-aircon/products/CS-225DFL.html"
       }
     },
     {
-      name: "パナソニック CS-225DEX",
+      name: "パナソニック CS-EX225D-W",
       specs: "6畳用｜最高クラスの省エネ＆快適性。自動お掃除＆AI快適制御搭載のプレミアムモデル",
       price: "¥175,000",
       originalPrice: "",
@@ -41,7 +41,7 @@ export default function ProductShowcase() {
       image: "https://placehold.jp/cccccc/ffffff/400x300.png?text=SAMPLE",
       modelKey: "panasonic-cs225dex",
       reference: {
-        description: "商品の詳細については、公式製品ページをご参照ください。",
+        description: "※本商品（CS-EX225D-W）は専門店モデルのため、公式サイトには掲載がありません。\n同等仕様のモデル「CS-225DEX」の公式製品ページを参考にご覧ください。",
         linkText: "CS-225DEX（パナソニック公式）",
         url: "https://panasonic.jp/housing-aircon/products/CS-225DEX.html"
       }

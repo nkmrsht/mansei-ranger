@@ -49,8 +49,8 @@ export const estimateData: EstimateSection[] = [
         options: [
           { label: "取付工事のみ（本体はお持ちの方）", price: 0 },
           { label: "シャープ AC-22TFC＋取付工事セット", price: 0 },
-          { label: "パナソニック CS-225DFL＋取付工事セット", price: 0 },
-          { label: "パナソニック CS-225DEX＋取付工事セット", price: 0 }
+          { label: "パナソニック CS-F225D-W＋取付工事セット", price: 0 },
+          { label: "パナソニック CS-EX225D-W＋取付工事セット", price: 0 }
         ],
         help: {
           reason: "お客様のご要望に最適なプランをご提案するため、まずは基本プランをお選びください。",
