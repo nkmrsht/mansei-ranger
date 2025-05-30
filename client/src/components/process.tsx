@@ -59,8 +59,8 @@ export default function Process() {
                 <div key={index} className="text-center group relative">
                   <div className="relative mb-8 flex items-center justify-center">
                     {/* 番号サークル */}
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110">
-                      <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                    <div className="w-24 h-24 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl group-hover:shadow-3xl transition-all duration-500 group-hover:scale-110 overflow-hidden relative">
+                      <div className="absolute top-1/2 left-1/2 w-full h-full rounded-full pointer-events-none" style={{ transform: 'translate(-50%, -50%) scale(0.88)', background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.01) 100%)' }}></div>
                       <span className="text-2xl font-bold text-white relative z-10">{step.number}</span>
                     </div>
                     
@@ -95,38 +95,33 @@ export default function Process() {
 
         {/* モバイル・タブレット表示 */}
         <div className="lg:hidden">
-          <div className="space-y-8">
+          <div className="space-y-6">
             {steps.map((step, index) => (
-              <div key={index} className="flex items-start space-x-6 group">
-                <div className="flex-shrink-0 relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300">
-                    <div className="absolute inset-2 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
-                    <span className="text-xl font-bold text-white relative z-10">{step.number}</span>
+              <div key={index} className="flex items-start space-x-4 group">
+                <div className="relative" style={{minWidth: '3rem', maxWidth: '3rem'}}>
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                    <span className="text-base font-bold text-white">{step.number}</span>
                   </div>
-                  
-
-                  
                   {index < steps.length - 1 && (
-                    <div className="absolute top-20 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-20">
-                      <svg className="w-6 h-6 text-primary mt-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute top-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-20">
+                      <svg className="w-4 h-4 text-primary mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
                     </div>
                   )}
                 </div>
-                
-                <div className="flex-1 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-white/20 group-hover:shadow-xl transition-all duration-300 group-hover:bg-white/90">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-blue-100 rounded-xl mr-4 flex items-center justify-center flex-shrink-0 text-primary text-xl pt-6 pb-2 px-2">
+                <div className="flex-1 bg-white/90 p-4 rounded-xl shadow border border-white/10">
+                  <div className="flex items-center mb-2">
+                    <div className="w-7 h-7 min-w-[1.75rem] max-w-[1.75rem] bg-gradient-to-br from-primary/10 to-blue-100 rounded-lg mr-3 flex items-center justify-center text-primary text-lg overflow-hidden">
                       <div className="flex items-center justify-center w-full h-full" style={{lineHeight: '0'}}>
-                        {step.icon}
+                        {React.cloneElement(step.icon, { className: 'w-5 h-5 text-primary' })}
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
+                      <h3 className="text-base font-bold text-gray-800">{step.title}</h3>
                     </div>
                   </div>
-                  <p className="text-gray-600 leading-relaxed">{step.description}</p>
+                  <p className="text-gray-600 text-sm">{step.description}</p>
                 </div>
               </div>
             ))}

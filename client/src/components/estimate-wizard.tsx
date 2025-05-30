@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Calculator, ArrowRight, ArrowLeft, HelpCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAnswer } from "@shared/estimate-schema";
+import { estimateData, BASE_INSTALLATION_PRICE, ORIGINAL_PRICE, type EstimateAnswer, AIRCON_MODELS } from "@shared/estimate-schema";
 import { saveEstimateData } from "@/lib/estimate-storage";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +17,7 @@ export default function EstimateWizard() {
   const [answers, setAnswers] = useState<EstimateAnswer[]>([]);
   const [showHelp, setShowHelp] = useState(false);
   const [helpContent, setHelpContent] = useState({ reason: "", guide: "" });
+  const questionCardRef = useRef<HTMLDivElement>(null);
 
   // 全質問を平坦化
   const allQuestions = estimateData.flatMap(section => 
@@ -25,6 +26,12 @@ export default function EstimateWizard() {
 
   const currentQuestionData = allQuestions[currentStep];
   const isLastQuestion = currentStep === allQuestions.length - 1;
+
+  // 選択されたプランを取得
+  const getSelectedPlan = () => {
+    const planAnswer = answers.find(a => a.questionId === "plan-selection");
+    return planAnswer ? planAnswer.selectedOption : -1;
+  };
 
   // 料金計算
   const calculateTotal = () => {
@@ -128,6 +135,24 @@ export default function EstimateWizard() {
     return getCurrentAnswer() !== undefined;
   };
 
+  // 次の質問を取得
+  const getNextQuestion = () => {
+    const selectedPlan = getSelectedPlan();
+    
+    // プラン選択後、本体＋工事セットを選んだ場合は畳数選択へ
+    if (currentQuestionData.id === "plan-selection" && selectedPlan > 0) {
+      return 1; // 畳数選択へ
+    }
+    
+    // 畳数選択後は共通設問へ
+    if (currentQuestionData.id === "model-size-selection") {
+      return 2; // 共通設問へ
+    }
+    
+    // その他の場合は次の質問へ
+    return currentStep + 1;
+  };
+
   if (!isStarted) {
     return (
       <section id="estimate-wizard" className="py-20 bg-gradient-to-b from-gray-50 to-white">
@@ -141,8 +166,8 @@ export default function EstimateWizard() {
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-lg border border-apple-border p-8">
-            <div className="text-center py-16">
+          <div className="bg-white rounded-3xl shadow-lg border border-apple-border p-4 md:p-8">
+            <div className="text-center py-8 md:py-16">
               <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
                 <Calculator className="w-12 h-12 text-primary" />
               </div>
@@ -153,7 +178,7 @@ export default function EstimateWizard() {
                 約3分で完了します。設置条件に応じた正確な工事費用をご確認いただけます。
               </p>
               <div className="flex flex-col items-center space-y-8">
-                <div className="w-full max-w-lg bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
+                <div className="w-full max-w-lg bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6 rounded-2xl border border-blue-100 shadow-sm">
                   <div className="flex items-center justify-center mb-3">
                     <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
                     <p className="text-sm font-medium text-gray-700">
@@ -177,13 +202,26 @@ export default function EstimateWizard() {
                   </div>
                   
                   <div className="flex items-center justify-center text-sm text-gray-600">
-                    <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
-                    <span>設置条件により追加料金が発生する場合があります</span>
+                    <span>※設置条件により追加料金が発生する場合があります</span>
                   </div>
                 </div>
                 
                 <Button 
-                  onClick={() => setIsStarted(true)}
+                  onClick={() => {
+                    setIsStarted(true);
+                    setTimeout(() => {
+                      if (window.innerWidth < 768 && questionCardRef.current) {
+                        const y = questionCardRef.current.getBoundingClientRect().top + window.pageYOffset - 20;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      } else {
+                        const estimateSection = document.getElementById('estimate-wizard');
+                        if (estimateSection) {
+                          const y = estimateSection.getBoundingClientRect().top + window.pageYOffset - 20;
+                          window.scrollTo({ top: y, behavior: 'smooth' });
+                        }
+                      }
+                    }, 100);
+                  }}
                   className="bg-gradient-to-r from-primary to-blue-600 text-white px-16 py-6 rounded-3xl hover:from-primary/90 hover:to-blue-600/90 transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-3xl w-full max-w-sm pt-[30px] pb-[30px] text-[21px] font-bold"
                 >
                   <span className="flex items-center justify-center space-x-3">
@@ -222,6 +260,9 @@ export default function EstimateWizard() {
           </div>
         </div>
 
+        {/* 質問カード直前にアンカー */}
+        <div ref={questionCardRef}></div>
+
         {/* 質問カード */}
         <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8">
@@ -250,40 +291,65 @@ export default function EstimateWizard() {
               {currentQuestionData.options.map((option, index) => {
                 const isSelected = getCurrentAnswer()?.selectedOption === index;
                 return (
-                  <button
-                    key={index}
-                    onClick={() => handleOptionSelect(index)}
-                    className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 transform hover:scale-[1.02] ${
-                      isSelected 
-                        ? 'border-primary bg-gradient-to-r from-primary/5 to-blue-50 shadow-md' 
-                        : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
-                          isSelected ? 'border-primary bg-primary' : 'border-gray-300'
-                        }`}>
-                          {isSelected && (
-                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                        <span className="font-medium text-gray-800">{option.label}</span>
-                      </div>
-                      {option.price > 0 && (
-                        <div className="bg-primary/10 px-3 py-1 rounded-full">
-                          <span className="font-bold text-primary text-sm">
-                            +¥{option.price.toLocaleString()}（税込）
+                  <div key={index}>
+                    <button
+                      onClick={() => handleOptionSelect(index)}
+                      className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 transform hover:scale-[1.02] ${
+                        isSelected 
+                          ? 'border-primary bg-gradient-to-r from-primary/5 to-blue-50 shadow-md' 
+                          : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
+                            isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                          }`}>
+                            {isSelected && (
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-medium text-gray-800">{option.label}
+                            {currentQuestionData.id === 'outlet-exists' && index === 1 && (
+                              <span className="block text-xs text-blue-600 mt-1">
+                                ※別途費用がかかります。現地調査時にご相談となります。
+                              </span>
+                            )}
                           </span>
                         </div>
-                      )}
-                    </div>
-                  </button>
+                        {option.price > 0 && (
+                          <div className="bg-primary/10 px-3 py-1 rounded-full">
+                            <span className="font-bold text-primary text-sm">
+                              +¥{option.price.toLocaleString()}（税込）
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  </div>
                 );
               })}
             </div>
+            {/* プラン選択のときだけ商品リンクを表示 */}
+            {currentQuestionData.id === 'plan-selection' && (
+              <div className="mt-6 text-center">
+                <a
+                  href="#product-showcase"
+                  className="text-blue-600 underline hover:text-blue-800 text-sm font-medium"
+                  onClick={e => {
+                    e.preventDefault();
+                    const el = document.getElementById('product-showcase');
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  商品の詳細についてはこちら
+                </a>
+              </div>
+            )}
           </CardContent>
         </Card>
 

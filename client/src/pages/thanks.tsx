@@ -46,14 +46,14 @@ export default function Thanks() {
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-                <a href="tel:047-123-4567" className="flex items-center justify-center space-x-2 text-primary hover:text-primary/80 transition-colors">
+                <a href="tel:047-364-8112" className="flex items-center justify-center space-x-2 text-primary hover:text-primary/80 transition-colors">
                   <Phone className="w-5 h-5" />
-                  <span className="font-medium">047-123-4567</span>
+                  <span className="font-medium">047-364-8112</span>
                 </a>
-                <Button variant="outline" className="flex items-center space-x-2">
-                  <MessageCircle className="w-4 h-4" />
-                  <span>LINEで相談</span>
-                </Button>
+                <a href="https://lin.ee/ozlb11w" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center space-x-2 text-primary hover:text-primary/80 transition-colors">
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="font-medium">LINEで相談</span>
+                </a>
               </div>
 
               <Link href="/">

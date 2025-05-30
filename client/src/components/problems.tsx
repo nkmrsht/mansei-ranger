@@ -29,13 +29,13 @@ export default function Problems() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-10 md:py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-apple-text mb-6">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-apple-text mb-3">
             こんなお悩み<br className="md:hidden" />ありませんか？
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-0">
             エアコン購入から設置まで、多くの方が抱える課題を解決します
           </p>
         </div>

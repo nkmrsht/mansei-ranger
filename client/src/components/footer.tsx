@@ -51,7 +51,7 @@ export default function Footer() {
                 <Mail className="w-4 h-4" />
                 <span>メールで相談</span>
               </a>
-              <a href="https://lin.ee/0OsWYCs" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors">
+              <a href="https://lin.ee/ozlb11w" className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors" target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="w-4 h-4" />
                 <span>LINEで相談</span>
               </a>
